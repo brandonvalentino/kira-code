@@ -9,19 +9,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/KeyboardDialog';
-import { Button } from '@vibe/ui/components/Button';
-import { Label } from '@vibe/ui/components/Label';
+} from '@kira/ui/components/KeyboardDialog';
+import { Button } from '@kira/ui/components/Button';
+import { Label } from '@kira/ui/components/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@vibe/ui/components/Select';
-import { AutoExpandingTextarea } from '@vibe/ui/components/AutoExpandingTextarea';
+} from '@kira/ui/components/Select';
+import { AutoExpandingTextarea } from '@kira/ui/components/AutoExpandingTextarea';
 import { VirtualizedProcessLogs } from '@/shared/components/VirtualizedProcessLogs';
-import { RunningDots } from '@vibe/ui/components/RunningDots';
+import { RunningDots } from '@kira/ui/components/RunningDots';
 import { defineModal } from '@/shared/lib/modals';
 import { repoApi, workspacesApi } from '@/shared/lib/api';
 import { useLogStream } from '@/shared/hooks/useLogStream';

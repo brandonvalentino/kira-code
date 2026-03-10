@@ -9,8 +9,8 @@ import {
 import { usePostHog } from 'posthog-js/react';
 import { useUserSystem } from '@/shared/hooks/useUserSystem';
 import { useTheme } from '@/shared/hooks/useTheme';
-import { OAuthSignInButton } from '@vibe/ui/components/OAuthButtons';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
+import { OAuthSignInButton } from '@kira/ui/components/OAuthButtons';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
 import { getFirstProjectDestination } from '@/shared/lib/firstProjectDestination';
 import { useOrganizationStore } from '@/shared/stores/useOrganizationStore';
 import { useAppNavigation } from '@/shared/hooks/useAppNavigation';
@@ -96,8 +96,8 @@ export function OnboardingSignInPage() {
 
   const logoSrc =
     resolveTheme(theme) === 'dark'
-      ? '/vibe-kanban-logo-dark.svg'
-      : '/vibe-kanban-logo.svg';
+      ? '/kira-code-logo-dark.svg'
+      : '/kira-code-logo.svg';
 
   const isLoggedIn = loginStatus?.status === 'loggedin';
 
@@ -236,7 +236,7 @@ export function OnboardingSignInPage() {
             <div className="flex justify-center">
               <img
                 src={logoSrc}
-                alt="Vibe Kanban"
+                alt="Kira Code"
                 className="h-8 w-auto logo"
               />
             </div>

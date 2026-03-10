@@ -19,7 +19,7 @@
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-router": "^1.161.1",
     "@tanstack/zod-adapter": "^1.161.1",
-    "@vibe/ui": "workspace:*",
+    "@kira/ui": "workspace:*",
     "@vibe/web-core": "workspace:*",
     "clsx": "^2.1.1",
     "posthog-js": "^1.283.0",

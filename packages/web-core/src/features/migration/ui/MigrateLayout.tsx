@@ -3,7 +3,7 @@ import { useAppNavigation } from '@/shared/hooks/useAppNavigation';
 import {
   MigrateSidebar,
   type MigrationStep,
-} from '@vibe/ui/components/MigrateSidebar';
+} from '@kira/ui/components/MigrateSidebar';
 import { MigrateIntroductionContainer } from './MigrateIntroductionContainer';
 import { MigrateChooseProjectsContainer } from './MigrateChooseProjectsContainer';
 import { MigrateMigrateContainer } from './MigrateMigrateContainer';

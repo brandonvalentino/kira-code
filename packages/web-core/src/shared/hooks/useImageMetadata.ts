@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { ImageMetadata } from 'shared/types';
-import type { LocalImageMetadata } from '@vibe/ui/components/WorkspaceContext';
+import type { LocalImageMetadata } from '@kira/ui/components/WorkspaceContext';
 
 export function useImageMetadata(
   workspaceId: string | undefined,

@@ -46,7 +46,7 @@ import { aggregateConsecutiveEntries } from '@/shared/lib/aggregateEntries';
 import type { WorkspaceWithSession } from '@/shared/types/attempt';
 import type { RepoWithTargetBranch } from 'shared/types';
 import { useWorkspaceContext } from '@/shared/hooks/useWorkspaceContext';
-import { ChatScriptPlaceholder } from '@vibe/ui/components/ChatScriptPlaceholder';
+import { ChatScriptPlaceholder } from '@kira/ui/components/ChatScriptPlaceholder';
 import { ScriptFixerDialog } from '@/shared/dialogs/scripts/ScriptFixerDialog';
 
 interface ConversationListProps {

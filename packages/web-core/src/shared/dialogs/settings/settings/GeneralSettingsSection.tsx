@@ -34,15 +34,15 @@ import {
   useMobileFontScale,
 } from '@/shared/stores/useUiPreferencesStore';
 import { cn } from '@/shared/lib/utils';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
-import { IconButton } from '@vibe/ui/components/IconButton';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
+import { IconButton } from '@kira/ui/components/IconButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuTriggerButton,
-} from '@vibe/ui/components/Dropdown';
+} from '@kira/ui/components/Dropdown';
 import {
   SettingsCard,
   SettingsCheckbox,

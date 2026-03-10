@@ -8,13 +8,13 @@ import {
   CheckCircle,
   ExternalLink,
 } from 'lucide-react';
-import { Button } from '@vibe/ui/components/Button';
+import { Button } from '@kira/ui/components/Button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@vibe/ui/components/RadixTooltip';
+} from '@kira/ui/components/RadixTooltip';
 import { useCallback, useMemo, useState } from 'react';
 import type { RepoBranchStatus, Merge, Workspace } from 'shared/types';
 import { ChangeTargetBranchDialog } from '@/shared/dialogs/command-bar/ChangeTargetBranchDialog';

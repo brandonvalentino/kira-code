@@ -7,10 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/KeyboardDialog';
-import { Button } from '@vibe/ui/components/Button';
-import { Label } from '@vibe/ui/components/Label';
-import { Switch } from '@vibe/ui/components/Switch';
+} from '@kira/ui/components/KeyboardDialog';
+import { Button } from '@kira/ui/components/Button';
+import { Label } from '@kira/ui/components/Label';
+import { Switch } from '@kira/ui/components/Switch';
 import { AgentSelector } from '@/shared/components/tasks/AgentSelector';
 import { ConfigSelector } from '@/shared/components/tasks/ConfigSelector';
 import { useUserSystem } from '@/shared/hooks/useUserSystem';

@@ -156,7 +156,7 @@ impl EditorConfig {
         let mut cmd = std::process::Command::new(&executable);
         cmd.args(&args)
             .arg("--install-extension")
-            .arg("bloop.vibe-kanban");
+            .arg("bloop.kira-code");
         let _ = cmd.spawn();
     }
 

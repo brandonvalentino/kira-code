@@ -23,25 +23,25 @@ import { CommandBarDialog } from '@/shared/dialogs/command-bar/CommandBarDialog'
 import {
   WorkspacesSidebar,
   type WorkspacesSidebarPersistKeys,
-} from '@vibe/ui/components/WorkspacesSidebar';
+} from '@kira/ui/components/WorkspacesSidebar';
 import {
   MultiSelectDropdown,
   type MultiSelectDropdownOption,
-} from '@vibe/ui/components/MultiSelectDropdown';
-import { PropertyDropdown } from '@vibe/ui/components/PropertyDropdown';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
-import { IconButton } from '@vibe/ui/components/IconButton';
+} from '@kira/ui/components/MultiSelectDropdown';
+import { PropertyDropdown } from '@kira/ui/components/PropertyDropdown';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
+import { IconButton } from '@kira/ui/components/IconButton';
 import {
   ButtonGroup,
   ButtonGroupItem,
-} from '@vibe/ui/components/IconButtonGroup';
+} from '@kira/ui/components/IconButtonGroup';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/Dialog';
+} from '@kira/ui/components/Dialog';
 import {
   FunnelIcon,
   FolderIcon,

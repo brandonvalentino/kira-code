@@ -3,8 +3,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@vibe/ui/components/Dropdown';
-import { InlineColorPicker } from '@vibe/ui/components/ColorPicker';
+} from '@kira/ui/components/Dropdown';
+import { InlineColorPicker } from '@kira/ui/components/ColorPicker';
 
 export interface ColorPickerProps {
   value: string;

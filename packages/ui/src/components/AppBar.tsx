@@ -382,7 +382,7 @@ export function AppBar({
       <div className="mt-auto pt-base flex flex-col items-center gap-4">
         {userPopover}
         <AppBarSocialLink
-          href="https://github.com/BloopAI/vibe-kanban"
+          href="https://github.com/BloopAI/kira-code"
           label="Star on GitHub"
           iconPath={githubIconPath}
           badge={

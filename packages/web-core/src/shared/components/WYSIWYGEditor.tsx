@@ -21,50 +21,50 @@ import {
   CODE,
   type Transformer,
 } from '@lexical/markdown';
-import { MarkdownInsertPlugin } from '@vibe/ui/components/MarkdownInsertPlugin';
-import { MarkdownListContinuePlugin } from '@vibe/ui/components/MarkdownListContinuePlugin';
+import { MarkdownInsertPlugin } from '@kira/ui/components/MarkdownInsertPlugin';
+import { MarkdownListContinuePlugin } from '@kira/ui/components/MarkdownListContinuePlugin';
 import {
   PrCommentNode,
   PR_COMMENT_TRANSFORMER,
   PR_COMMENT_EXPORT_TRANSFORMER,
-} from '@vibe/ui/components/pr-comment-node';
-import { createImageNode } from '@vibe/ui/components/image-node';
+} from '@kira/ui/components/pr-comment-node';
+import { createImageNode } from '@kira/ui/components/image-node';
 import {
   ComponentInfoNode,
   COMPONENT_INFO_TRANSFORMER,
   COMPONENT_INFO_EXPORT_TRANSFORMER,
   $isComponentInfoNode,
-} from '@vibe/ui/components/component-info-node';
-import { TABLE_TRANSFORMER } from '@vibe/ui/lib/table-transformer';
+} from '@kira/ui/components/component-info-node';
+import { TABLE_TRANSFORMER } from '@kira/ui/lib/table-transformer';
 import {
   WorkspaceContext as EditorWorkspaceContext,
   SessionContext,
   LocalImagesContext,
   type LocalImageMetadata,
-} from '@vibe/ui/components/WorkspaceContext';
-import { TypeaheadOpenProvider } from '@vibe/ui/components/TypeaheadOpenContext';
+} from '@kira/ui/components/WorkspaceContext';
+import { TypeaheadOpenProvider } from '@kira/ui/components/TypeaheadOpenContext';
 import {
   FileTagTypeaheadPlugin,
   type RepoLike,
   type SearchResultItemLike,
-} from '@vibe/ui/components/FileTagTypeaheadPlugin';
-import { SlashCommandTypeaheadPlugin } from '@vibe/ui/components/SlashCommandTypeaheadPlugin';
-import { KeyboardCommandsPlugin } from '@vibe/ui/components/KeyboardCommandsPlugin';
-import { ImageKeyboardPlugin } from '@vibe/ui/components/ImageKeyboardPlugin';
-import { ComponentInfoKeyboardPlugin } from '@vibe/ui/components/ComponentInfoKeyboardPlugin';
-import { ReadOnlyLinkPlugin } from '@vibe/ui/components/ReadOnlyLinkPlugin';
-import { ClickableCodePlugin } from '@vibe/ui/components/ClickableCodePlugin';
-import { ToolbarPlugin } from '@vibe/ui/components/ToolbarPlugin';
-import { StaticToolbarPlugin } from '@vibe/ui/components/StaticToolbarPlugin';
-import { PasteMarkdownPlugin } from '@vibe/ui/components/PasteMarkdownPlugin';
-import { MarkdownSyncPlugin } from '@vibe/ui/components/MarkdownSyncPlugin';
+} from '@kira/ui/components/FileTagTypeaheadPlugin';
+import { SlashCommandTypeaheadPlugin } from '@kira/ui/components/SlashCommandTypeaheadPlugin';
+import { KeyboardCommandsPlugin } from '@kira/ui/components/KeyboardCommandsPlugin';
+import { ImageKeyboardPlugin } from '@kira/ui/components/ImageKeyboardPlugin';
+import { ComponentInfoKeyboardPlugin } from '@kira/ui/components/ComponentInfoKeyboardPlugin';
+import { ReadOnlyLinkPlugin } from '@kira/ui/components/ReadOnlyLinkPlugin';
+import { ClickableCodePlugin } from '@kira/ui/components/ClickableCodePlugin';
+import { ToolbarPlugin } from '@kira/ui/components/ToolbarPlugin';
+import { StaticToolbarPlugin } from '@kira/ui/components/StaticToolbarPlugin';
+import { PasteMarkdownPlugin } from '@kira/ui/components/PasteMarkdownPlugin';
+import { MarkdownSyncPlugin } from '@kira/ui/components/MarkdownSyncPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListNode, ListItemNode } from '@lexical/list';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
-import { CodeHighlightPlugin } from '@vibe/ui/components/CodeHighlightPlugin';
-import { CODE_HIGHLIGHT_CLASSES } from '@vibe/ui/lib/code-highlight-theme';
+import { CodeHighlightPlugin } from '@kira/ui/components/CodeHighlightPlugin';
+import { CODE_HIGHLIGHT_CLASSES } from '@kira/ui/lib/code-highlight-theme';
 import { LinkNode } from '@lexical/link';
 import { TableNode, TableRowNode, TableCellNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
@@ -76,7 +76,7 @@ import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore';
 import { cn } from '@/shared/lib/utils';
 import { repoApi } from '@/shared/lib/api';
 import { searchTagsAndFiles } from '@/shared/lib/searchTagsAndFiles';
-import { Button } from '@vibe/ui/components/Button';
+import { Button } from '@kira/ui/components/Button';
 import {
   Check,
   Clipboard,

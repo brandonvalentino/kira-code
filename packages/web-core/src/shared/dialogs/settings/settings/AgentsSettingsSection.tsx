@@ -12,7 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@vibe/ui/components/Dropdown';
+} from '@kira/ui/components/Dropdown';
 import { ExecutorConfigForm } from './ExecutorConfigForm';
 import { useProfiles } from '@/shared/hooks/useProfiles';
 import { useUserSystem } from '@/shared/hooks/useUserSystem';

@@ -14,7 +14,7 @@ import { useUserSystem } from '@/shared/hooks/useUserSystem';
 import { useAuth } from '@/shared/hooks/auth/useAuth';
 import { relayApi } from '@/shared/lib/api';
 import { normalizeEnrollmentCode } from '@/shared/lib/relayPake';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
 import {
   usePairRelayHostMutation,
   useRelayRemoteHostsQuery,
@@ -41,7 +41,7 @@ interface PairedHostRow {
 
 const RELAY_PAIRED_CLIENTS_QUERY_KEY = ['relay', 'paired-clients'] as const;
 const RELAY_REMOTE_CONTROL_DOCS_URL =
-  'https://www.vibekanban.com/docs/remote-control';
+  'https://www.kiracode.com/docs/remote-control';
 
 interface RelaySettingsSectionInitialState {
   hostId?: string;

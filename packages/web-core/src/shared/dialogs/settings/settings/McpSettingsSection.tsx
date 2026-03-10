@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuTriggerButton,
-} from '@vibe/ui/components/Dropdown';
+} from '@kira/ui/components/Dropdown';
 import {
   SettingsCard,
   SettingsField,

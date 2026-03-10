@@ -38,7 +38,7 @@ import { IdeIcon } from '@/shared/components/IdeIcon';
 import { getIdeName } from '@/shared/lib/ideName';
 import { cn } from '@/shared/lib/utils';
 import { useAppNavigation } from '@/shared/hooks/useAppNavigation';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
 
 type SoundOption = {
   value: SoundFile;
@@ -114,12 +114,12 @@ const SOCIAL_LINKS = [
   },
   {
     label: 'GitHub',
-    href: 'https://github.com/BloopAI/vibe-kanban',
+    href: 'https://github.com/BloopAI/kira-code',
     icon: GithubLogoIcon,
   },
   {
     label: 'Docs',
-    href: 'https://www.vibekanban.com/docs',
+    href: 'https://www.kiracode.com/docs',
     icon: BookOpenIcon,
   },
 ];
@@ -176,8 +176,8 @@ export function LandingPage() {
 
   const logoSrc =
     resolveTheme(theme) === 'dark'
-      ? '/vibe-kanban-logo-dark.svg'
-      : '/vibe-kanban-logo.svg';
+      ? '/kira-code-logo-dark.svg'
+      : '/kira-code-logo.svg';
 
   useEffect(() => {
     if (!config || initialized) return;
@@ -333,7 +333,7 @@ export function LandingPage() {
             <div className="flex justify-center">
               <img
                 src={logoSrc}
-                alt="Vibe Kanban"
+                alt="Kira Code"
                 className="h-8 w-auto logo"
               />
             </div>
@@ -356,7 +356,7 @@ export function LandingPage() {
                 />
                 <div className="space-y-half text-sm text-normal">
                   <p>
-                    Vibe Kanban runs AI coding agents with{' '}
+                    Kira Code runs AI coding agents with{' '}
                     <code>--dangerously-skip-permissions</code> /{' '}
                     <code>--yolo</code> by default.
                   </p>
@@ -364,7 +364,7 @@ export function LandingPage() {
                     Always review what agents are doing and keep backups of
                     important work. Learn more at{' '}
                     <a
-                      href="https://www.vibekanban.com/docs/getting-started#safety-notice"
+                      href="https://www.kiracode.com/docs/getting-started#safety-notice"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-brand hover:underline"
@@ -559,7 +559,7 @@ export function LandingPage() {
             <p className="text-xs text-low">
               By continuing you agree to the{' '}
               <a
-                href="https://www.vibekanban.com/terms"
+                href="https://www.kiracode.com/terms"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-brand hover:underline"
@@ -568,7 +568,7 @@ export function LandingPage() {
               </a>{' '}
               and{' '}
               <a
-                href="https://www.vibekanban.com/privacy"
+                href="https://www.kiracode.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-brand hover:underline"

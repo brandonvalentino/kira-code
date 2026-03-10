@@ -3,7 +3,7 @@ import {
   ChangesPanel,
   type ChangesPanelHandle,
   type RenderDiffItemProps,
-} from '@vibe/ui/components/ChangesPanel';
+} from '@kira/ui/components/ChangesPanel';
 import { sortDiffs } from '@/shared/lib/fileTreeUtils';
 import { useChangesView } from '@/shared/hooks/useChangesView';
 import { useWorkspaceContext } from '@/shared/hooks/useWorkspaceContext';

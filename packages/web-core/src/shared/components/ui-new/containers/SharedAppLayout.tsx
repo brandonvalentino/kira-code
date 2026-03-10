@@ -9,8 +9,8 @@ import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore';
 import { cn } from '@/shared/lib/utils';
 
 import { NavbarContainer } from './NavbarContainer';
-import { AppBar } from '@vibe/ui/components/AppBar';
-import { MobileDrawer } from '@vibe/ui/components/MobileDrawer';
+import { AppBar } from '@kira/ui/components/AppBar';
+import { MobileDrawer } from '@kira/ui/components/MobileDrawer';
 import { AppBarUserPopoverContainer } from './AppBarUserPopoverContainer';
 import { useUserOrganizations } from '@/shared/hooks/useUserOrganizations';
 import { useOrganizationStore } from '@/shared/stores/useOrganizationStore';
@@ -44,7 +44,7 @@ import {
   type Project as RemoteProject,
 } from 'shared/remote-types';
 import { WorkspacesSidebarContainer } from '@/pages/workspaces/WorkspacesSidebarContainer';
-import { WorkspacesSidebarReopenTag } from '@vibe/ui/components/WorkspacesSidebar';
+import { WorkspacesSidebarReopenTag } from '@kira/ui/components/WorkspacesSidebar';
 
 export function SharedAppLayout() {
   const appNavigation = useAppNavigation();

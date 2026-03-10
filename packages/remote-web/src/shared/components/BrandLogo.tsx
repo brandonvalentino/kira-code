@@ -5,15 +5,15 @@ interface BrandLogoProps {
 
 export function BrandLogo({
   className = "h-8 w-auto",
-  alt = "Vibe Kanban",
+  alt = "Kira Code",
 }: BrandLogoProps) {
   return (
     <picture>
       <source
-        srcSet="/vibe-kanban-logo-dark.svg"
+        srcSet="/kira-code-logo-dark.svg"
         media="(prefers-color-scheme: dark)"
       />
-      <img src="/vibe-kanban-logo.svg" alt={alt} className={className} />
+      <img src="/kira-code-logo.svg" alt={alt} className={className} />
     </picture>
   );
 }

@@ -26,7 +26,7 @@ import {
   SettingsDirtyProvider,
   useSettingsDirty,
 } from './settings/SettingsDirtyContext';
-import { ConfirmDialog } from '@vibe/ui/components/ConfirmDialog';
+import { ConfirmDialog } from '@kira/ui/components/ConfirmDialog';
 
 const SETTINGS_SECTIONS: {
   id: SettingsSectionType;

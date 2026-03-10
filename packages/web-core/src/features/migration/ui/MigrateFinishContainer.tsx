@@ -5,7 +5,7 @@ import { useOrganizationStore } from '@/shared/stores/useOrganizationStore';
 import {
   MigrateFinish,
   type MigrateFinishProject,
-} from '@vibe/ui/components/MigrateFinish';
+} from '@kira/ui/components/MigrateFinish';
 
 interface MigrateFinishContainerProps {
   orgId: string;

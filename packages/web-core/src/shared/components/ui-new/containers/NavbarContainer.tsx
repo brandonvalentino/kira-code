@@ -9,7 +9,7 @@ import {
   Navbar,
   type NavbarSectionItem,
   type MobileTabId,
-} from '@vibe/ui/components/Navbar';
+} from '@kira/ui/components/Navbar';
 import { RemoteIssueLink } from './RemoteIssueLink';
 import { AppBarUserPopoverContainer } from './AppBarUserPopoverContainer';
 import { NavbarActionGroups } from '@/shared/actions';

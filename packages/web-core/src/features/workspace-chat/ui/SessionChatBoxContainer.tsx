@@ -40,7 +40,7 @@ import {
   SessionChatBox,
   type ExecutionStatus,
   type SessionChatBoxEditorRenderProps,
-} from '@vibe/ui/components/SessionChatBox';
+} from '@kira/ui/components/SessionChatBox';
 import { ModelSelectorContainer } from '@/shared/components/ModelSelectorContainer';
 import {
   useWorkspacePanelState,
@@ -58,7 +58,7 @@ import {
 import { SettingsDialog } from '@/shared/dialogs/settings/SettingsDialog';
 import { useActionVisibilityContext } from '@/shared/hooks/useActionVisibilityContext';
 import { PrCommentsDialog } from '@/shared/dialogs/tasks/PrCommentsDialog';
-import type { NormalizedComment } from '@vibe/ui/components/pr-comment-node';
+import type { NormalizedComment } from '@kira/ui/components/pr-comment-node';
 import { useAppNavigation } from '@/shared/hooks/useAppNavigation';
 
 /** Compute execution status from boolean flags */

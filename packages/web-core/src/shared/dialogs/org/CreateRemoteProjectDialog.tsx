@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Button } from '@vibe/ui/components/Button';
-import { Input } from '@vibe/ui/components/Input';
-import { Label } from '@vibe/ui/components/Label';
+import { Button } from '@kira/ui/components/Button';
+import { Input } from '@kira/ui/components/Input';
+import { Label } from '@kira/ui/components/Label';
 import {
   Dialog,
   DialogContent,
@@ -9,8 +9,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/KeyboardDialog';
-import { Alert, AlertDescription } from '@vibe/ui/components/Alert';
+} from '@kira/ui/components/KeyboardDialog';
+import { Alert, AlertDescription } from '@kira/ui/components/Alert';
 import { create, useModal } from '@ebay/nice-modal-react';
 import { useTranslation } from 'react-i18next';
 import { defineModal } from '@/shared/lib/modals';

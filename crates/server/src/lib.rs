@@ -5,6 +5,6 @@ pub mod routes;
 pub mod tunnel;
 
 // #[cfg(feature = "cloud")]
-// type DeploymentImpl = vibe_kanban_cloud::deployment::CloudDeployment;
+// type DeploymentImpl = kira_code_cloud::deployment::CloudDeployment;
 // #[cfg(not(feature = "cloud"))]
 pub type DeploymentImpl = local_deployment::LocalDeployment;

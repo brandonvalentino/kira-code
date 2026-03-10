@@ -5,11 +5,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/KeyboardDialog';
-import { Button } from '@vibe/ui/components/Button';
-import { Alert, AlertDescription } from '@vibe/ui/components/Alert';
+} from '@kira/ui/components/KeyboardDialog';
+import { Button } from '@kira/ui/components/Button';
+import { Alert, AlertDescription } from '@kira/ui/components/Alert';
 import { LogIn, Loader2 } from 'lucide-react';
-import { OAuthSignInButton } from '@vibe/ui/components/OAuthButtons';
+import { OAuthSignInButton } from '@kira/ui/components/OAuthButtons';
 import { create, useModal } from '@ebay/nice-modal-react';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';

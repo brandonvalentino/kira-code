@@ -1,9 +1,9 @@
 {
-  "vibe_kanban": {
+  "kira_code": {
     "command": "npx",
     "args": [
       "-y",
-      "vibe-kanban@latest",
+      "kira-code@latest",
       "--mcp"
     ]
   },
@@ -45,10 +45,10 @@
     ]
   },
   "meta": {
-    "vibe_kanban": {
-      "name": "Vibe Kanban",
-      "description": "Create, update and delete Vibe Kanban tasks",
-      "url": "https://www.vibekanban.com/docs/integrations/vibe-kanban-mcp-server",
+    "kira_code": {
+      "name": "Kira Code",
+      "description": "Create, update and delete Kira Code tasks",
+      "url": "https://www.kiracode.com/docs/integrations/kira-code-mcp-server",
       "icon": "favicon-vk-light.svg"
     },
     "context7": {

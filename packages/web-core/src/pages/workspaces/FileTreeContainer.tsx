@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { FileTree } from '@vibe/ui/components/FileTree';
+import { FileTree } from '@kira/ui/components/FileTree';
 import {
   buildFileTree,
   filterFileTree,

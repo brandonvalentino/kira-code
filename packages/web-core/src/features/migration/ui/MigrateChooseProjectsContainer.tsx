@@ -3,7 +3,7 @@ import { useProjects } from '../model/hooks/useProjects';
 import { useUserOrganizations } from '@/shared/hooks/useUserOrganizations';
 import { useAppNavigation } from '@/shared/hooks/useAppNavigation';
 import { useOrganizationStore } from '@/shared/stores/useOrganizationStore';
-import { MigrateChooseProjects } from '@vibe/ui/components/MigrateChooseProjects';
+import { MigrateChooseProjects } from '@kira/ui/components/MigrateChooseProjects';
 
 interface MigrateChooseProjectsContainerProps {
   onContinue: (orgId: string, projectIds: string[]) => void;

@@ -1,6 +1,6 @@
 import { useAuth } from '@/shared/hooks/auth/useAuth';
 import { OAuthDialog } from '@/shared/dialogs/global/OAuthDialog';
-import { MigrateIntroduction } from '@vibe/ui/components/MigrateIntroduction';
+import { MigrateIntroduction } from '@kira/ui/components/MigrateIntroduction';
 
 interface MigrateIntroductionContainerProps {
   onContinue: () => void;

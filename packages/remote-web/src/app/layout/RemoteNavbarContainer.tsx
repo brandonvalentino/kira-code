@@ -5,7 +5,7 @@ import {
   Navbar,
   type MobileTabId,
   type NavbarSectionItem,
-} from "@vibe/ui/components/Navbar";
+} from "@kira/ui/components/Navbar";
 import { SettingsDialog } from "@/shared/dialogs/settings/SettingsDialog";
 import { CommandBarDialog } from "@/shared/dialogs/command-bar/CommandBarDialog";
 import { REMOTE_SETTINGS_SECTIONS } from "@remote/shared/constants/settings";

@@ -14,27 +14,27 @@ import {
   type KanbanFilterState,
   type KanbanSortField,
 } from '@/shared/stores/useUiPreferencesStore';
-import { UserAvatar } from '@vibe/ui/components/UserAvatar';
-import { KanbanAssignee } from '@vibe/ui/components/KanbanAssignee';
-import { Badge } from '@vibe/ui/components/Badge';
+import { UserAvatar } from '@kira/ui/components/UserAvatar';
+import { KanbanAssignee } from '@kira/ui/components/KanbanAssignee';
+import { Badge } from '@kira/ui/components/Badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/Dialog';
-import { Switch } from '@vibe/ui/components/Switch';
+} from '@kira/ui/components/Dialog';
+import { Switch } from '@kira/ui/components/Switch';
 import { AssigneeSelectionDialog } from '@/shared/dialogs/kanban/AssigneeSelectionDialog';
-import { PriorityFilterDropdown } from '@vibe/ui/components/PriorityFilterDropdown';
+import { PriorityFilterDropdown } from '@kira/ui/components/PriorityFilterDropdown';
 import {
   MultiSelectDropdown,
   type MultiSelectDropdownOption,
-} from '@vibe/ui/components/MultiSelectDropdown';
+} from '@kira/ui/components/MultiSelectDropdown';
 import {
   PropertyDropdown,
   type PropertyDropdownOption,
-} from '@vibe/ui/components/PropertyDropdown';
+} from '@kira/ui/components/PropertyDropdown';
 
 const SORT_OPTIONS: PropertyDropdownOption<KanbanSortField>[] = [
   { value: 'sort_order', label: 'Manual' },

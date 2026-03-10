@@ -16,8 +16,8 @@ import { cn } from '@/shared/lib/utils';
 import { useCreateMode } from '@/shared/hooks/useCreateMode';
 import { FolderPickerDialog } from '@/shared/dialogs/shared/FolderPickerDialog';
 import { SettingsDialog } from '@/shared/dialogs/settings/SettingsDialog';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
-import { CreateRepoDialog } from '@vibe/ui/components/CreateRepoDialog';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
+import { CreateRepoDialog } from '@kira/ui/components/CreateRepoDialog';
 import {
   SelectionDialog,
   type SelectionPage,

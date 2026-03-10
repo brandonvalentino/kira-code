@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
-import { Button } from '@vibe/ui/components/Button';
-import { Input } from '@vibe/ui/components/Input';
-import { Label } from '@vibe/ui/components/Label';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
+import { Button } from '@kira/ui/components/Button';
+import { Input } from '@kira/ui/components/Input';
+import { Label } from '@kira/ui/components/Label';
 import {
   Dialog,
   DialogContent,
@@ -10,15 +10,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@vibe/ui/components/KeyboardDialog';
+} from '@kira/ui/components/KeyboardDialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@vibe/ui/components/Select';
-import { Alert, AlertDescription } from '@vibe/ui/components/Alert';
+} from '@kira/ui/components/Select';
+import { Alert, AlertDescription } from '@kira/ui/components/Alert';
 import { create, useModal } from '@ebay/nice-modal-react';
 import { useOrganizationMutations } from '@/shared/hooks/useOrganizationMutations';
 import { MemberRole } from 'shared/types';

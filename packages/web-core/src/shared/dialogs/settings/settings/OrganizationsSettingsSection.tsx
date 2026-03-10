@@ -31,14 +31,14 @@ import { MemberRole as MemberRoleEnum } from 'shared/types';
 import { ApiError, organizationsApi } from '@/shared/lib/api';
 import { cn } from '@/shared/lib/utils';
 import { getRemoteApiUrl } from '@/shared/lib/remoteApi';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuTriggerButton,
-} from '@vibe/ui/components/Dropdown';
+} from '@kira/ui/components/Dropdown';
 import { SettingsCard, SettingsField } from './SettingsComponents';
 
 export function OrganizationsSettingsSection() {

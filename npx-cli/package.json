@@ -1,19 +1,19 @@
 {
-  "name": "vibe-kanban",
+  "name": "kira-code",
   "private": false,
   "version": "0.1.27",
   "main": "index.js",
   "bin": {
-    "vibe-kanban": "bin/cli.js"
+    "kira-code": "bin/cli.js"
   },
   "keywords": [],
   "author": "bloop",
   "repository": {
     "type": "git",
-    "url": "https://github.com/BloopAI/vibe-kanban"
+    "url": "https://github.com/BloopAI/kira-code"
   },
   "license": "",
-  "description": "NPX wrapper around vibe-kanban and vibe-kanban-mcp",
+  "description": "NPX wrapper around kira-code and kira-code-mcp",
   "dependencies": {
     "adm-zip": "^0.5.16"
   },

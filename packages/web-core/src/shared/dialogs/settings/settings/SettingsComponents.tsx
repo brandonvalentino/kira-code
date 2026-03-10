@@ -7,8 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuTriggerButton,
-} from '@vibe/ui/components/Dropdown';
-import { PrimaryButton } from '@vibe/ui/components/PrimaryButton';
+} from '@kira/ui/components/Dropdown';
+import { PrimaryButton } from '@kira/ui/components/PrimaryButton';
 
 // ============================================================================
 // Two-Column Picker Components
