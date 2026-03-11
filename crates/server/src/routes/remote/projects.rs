@@ -1,23 +1,23 @@
+use aide::axum::{ApiRouter, routing::get};
 use api_types::{ListProjectsResponse, Project};
 use axum::{
-    Router,
     extract::{Path, Query, State},
     response::Json as ResponseJson,
-    routing::get,
 };
+use schemars::JsonSchema;
 use serde::Deserialize;
 use utils::response::ApiResponse;
 use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ListRemoteProjectsQuery {
     pub organization_id: Uuid,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
         .route("/projects", get(list_remote_projects))
         .route("/projects/{project_id}", get(get_remote_project))
 }

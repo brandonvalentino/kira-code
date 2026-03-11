@@ -1,16 +1,20 @@
 use std::path::PathBuf;
 
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post, put},
+};
 use axum::{
-    Router,
     extract::{Path, Query, State},
     http::StatusCode,
     response::Json as ResponseJson,
-    routing::{get, post},
+    routing::{get as axum_get, put as axum_put},
 };
 use db::models::repo::{Repo, SearchResult, UpdateRepo};
 use deployment::Deployment;
 use git::{GitBranch, GitRemote};
 use git_host::{GitHostError, GitHostProvider, GitHostService, OpenPrInfo, ProviderKind};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::file_search::SearchQuery;
 use ts_rs::TS;
@@ -19,30 +23,30 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, JsonSchema)]
 pub struct OpenEditorRequest {
     pub editor_type: Option<String>,
     pub git_repo_path: Option<PathBuf>,
 }
 
-#[derive(Debug, serde::Serialize, ts_rs::TS)]
+#[derive(Debug, serde::Serialize, ts_rs::TS, JsonSchema)]
 pub struct OpenEditorResponse {
     pub url: Option<String>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct RegisterRepoRequest {
     pub path: String,
     pub display_name: Option<String>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct InitRepoRequest {
     pub parent_path: String,
     pub folder_name: String,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct BatchRepoRequest {
     pub ids: Vec<Uuid>,
 }
@@ -231,7 +235,7 @@ pub async fn search_repo(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum ListPrsError {
@@ -240,7 +244,7 @@ pub enum ListPrsError {
     UnsupportedProvider,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ListPrsQuery {
     pub remote: Option<String>,
 }
@@ -294,7 +298,7 @@ pub async fn list_open_prs(
     }
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct DeleteRepoConflict {
     pub message: String,
     pub workspaces: Vec<String>,
@@ -325,19 +329,17 @@ pub async fn delete_repo(
     Ok((StatusCode::OK, ResponseJson(ApiResponse::success(()))))
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/repos", get(get_repos).post(register_repo))
-        .route("/repos/recent", get(get_recent_repos))
-        .route("/repos/init", post(init_repo))
-        .route("/repos/batch", post(get_repos_batch))
-        .route(
-            "/repos/{repo_id}",
-            get(get_repo).put(update_repo).delete(delete_repo),
-        )
-        .route("/repos/{repo_id}/branches", get(get_repo_branches))
-        .route("/repos/{repo_id}/remotes", get(get_repo_remotes))
-        .route("/repos/{repo_id}/prs", get(list_open_prs))
-        .route("/repos/{repo_id}/search", get(search_repo))
-        .route("/repos/{repo_id}/open-editor", post(open_repo_in_editor))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/repos", get(get_repos).post(register_repo))
+        .api_route("/repos/recent", get(get_recent_repos))
+        .api_route("/repos/init", post(init_repo))
+        .api_route("/repos/batch", post(get_repos_batch))
+        .api_route("/repos/{repo_id}", get(get_repo).delete(delete_repo))
+        .route("/repos/{repo_id}", axum_put(update_repo))
+        .route("/repos/{repo_id}/branches", axum_get(get_repo_branches))
+        .route("/repos/{repo_id}/remotes", axum_get(get_repo_remotes))
+        .api_route("/repos/{repo_id}/prs", get(list_open_prs))
+        .route("/repos/{repo_id}/search", axum_get(search_repo))
+        .api_route("/repos/{repo_id}/open-editor", post(open_repo_in_editor))
 }

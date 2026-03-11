@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use executors::profile::ExecutorConfig;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use strum_macros::{Display, EnumDiscriminants, EnumString};
@@ -18,7 +19,7 @@ pub enum ScratchError {
 }
 
 /// Data for a draft follow-up scratch
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct DraftFollowUpData {
     pub message: String,
     #[serde(alias = "executor_profile_id", alias = "config")]
@@ -26,7 +27,7 @@ pub struct DraftFollowUpData {
 }
 
 /// Data for preview settings scratch (URL override and screen size)
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct PreviewSettingsData {
     pub url: String,
     #[serde(default)]
@@ -38,20 +39,20 @@ pub struct PreviewSettingsData {
 }
 
 /// Data for workspace notes scratch
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct WorkspaceNotesData {
     pub content: String,
 }
 
 /// Workspace-specific panel state
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct WorkspacePanelStateData {
     pub right_main_panel_mode: Option<String>,
     pub is_left_main_panel_visible: bool,
 }
 
 /// Workspace sidebar PR filter state
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Default, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkspacePrFilterData {
     #[default]
@@ -61,7 +62,7 @@ pub enum WorkspacePrFilterData {
 }
 
 /// Workspace sidebar sort field
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Default, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkspaceSortByData {
     #[default]
@@ -70,7 +71,7 @@ pub enum WorkspaceSortByData {
 }
 
 /// Workspace sidebar sort order
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Default, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkspaceSortOrderData {
     Asc,
@@ -79,7 +80,7 @@ pub enum WorkspaceSortOrderData {
 }
 
 /// Workspace sidebar filter state
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Default, JsonSchema)]
 pub struct WorkspaceFilterStateData {
     #[serde(default)]
     pub project_ids: Vec<String>,
@@ -88,7 +89,7 @@ pub struct WorkspaceFilterStateData {
 }
 
 /// Workspace sidebar sort state
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Default, JsonSchema)]
 pub struct WorkspaceSortStateData {
     #[serde(default)]
     pub sort_by: WorkspaceSortByData,
@@ -97,7 +98,7 @@ pub struct WorkspaceSortStateData {
 }
 
 /// Data for UI preferences scratch (global preferences stored per-user or per-device)
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct UiPreferencesData {
     /// Preferred repo actions per repo
     #[serde(default)]
@@ -144,7 +145,7 @@ pub struct UiPreferencesData {
 }
 
 /// Linked issue data for draft workspace scratch
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct DraftWorkspaceLinkedIssue {
     pub issue_id: String,
     pub simple_id: String,
@@ -153,7 +154,7 @@ pub struct DraftWorkspaceLinkedIssue {
 }
 
 /// Uploaded image stored in a draft workspace
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct DraftWorkspaceImage {
     pub id: Uuid,
     pub file_path: String,
@@ -191,7 +192,7 @@ pub struct ProjectRepoDefaultsData {
 }
 
 /// Data for a draft issue scratch (issue creation on kanban board)
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct DraftIssueData {
     #[serde(default)]
     pub title: String,
@@ -219,7 +220,7 @@ pub struct DraftIssueData {
 #[derive(Debug, Clone, Serialize, Deserialize, TS, EnumDiscriminants)]
 #[serde(tag = "type", content = "data", rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum_discriminants(name(ScratchType))]
-#[strum_discriminants(derive(Display, EnumString, Serialize, Deserialize, TS))]
+#[strum_discriminants(derive(Display, EnumString, Serialize, Deserialize, TS, JsonSchema))]
 #[strum_discriminants(ts(use_ts_enum))]
 #[strum_discriminants(serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 #[strum_discriminants(strum(serialize_all = "SCREAMING_SNAKE_CASE"))]

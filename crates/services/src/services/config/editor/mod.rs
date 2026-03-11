@@ -1,6 +1,7 @@
 use std::{path::Path, str::FromStr};
 
 use executors::{command::CommandBuilder, executors::ExecutorError};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{EnumIter, EnumString};
 use thiserror::Error;
@@ -10,7 +11,7 @@ fn default_auto_install_extension() -> bool {
     true
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Error)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Error, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum EditorOpenError {
@@ -32,7 +33,7 @@ pub enum EditorOpenError {
     },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct EditorConfig {
     editor_type: EditorType,
     custom_command: Option<String>,
@@ -44,7 +45,7 @@ pub struct EditorConfig {
     auto_install_extension: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS, EnumString, EnumIter)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, EnumString, EnumIter, JsonSchema)]
 #[ts(use_ts_enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]

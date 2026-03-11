@@ -1,17 +1,17 @@
+use aide::axum::{ApiRouter, routing::get};
 use axum::{
-    Router,
     extract::{Query, State},
     response::Json as ResponseJson,
-    routing::get,
 };
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::filesystem::{DirectoryEntry, DirectoryListResponse, FilesystemError};
 use utils::response::ApiResponse;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ListDirectoryQuery {
     path: Option<String>,
 }
@@ -71,8 +71,8 @@ pub async fn list_git_repos(
     }
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/filesystem/directory", get(list_directory))
-        .route("/filesystem/git-repos", get(list_git_repos))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/filesystem/directory", get(list_directory))
+        .api_route("/filesystem/git-repos", get(list_git_repos))
 }

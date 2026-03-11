@@ -1,43 +1,52 @@
 ## Why
 
-Kira Code (formerly Vibe Kanban) is pivoting from a local-first multi-agent CLI wrapper to a centralized, Cloud-first platform. The current architecture maintains bespoke wrappers for half a dozen AI coding agents (`claude-code`, `amp`, `codex`, `gemini-cli`, etc.), creating high maintenance overhead while delivering an inconsistent user experience. By adopting Pi as the single execution runtime and shifting infrastructure focus to the remote/cloud stack, Kira can deliver a more reliable, scalable, and maintainable product to teams.
+Kira Code (formerly Vibe Kanban) is pivoting hard to a **cloud-first platform**. The old architecture ran everything locally — a Rust HTTP server, a local web UI, SQLite, and a binary bootstrapper (`npx-cli`) that downloaded platform-specific Rust binaries from R2. That model made sense when the product was `npx vibe-kanban`. It makes no sense for a cloud product.
+
+The current executor system also maintains bespoke wrappers for ~10 AI coding agents (`claude-code`, `amp`, `codex`, `gemini-cli`, etc.), each parsing a different CLI's stdout in an ad-hoc way. High maintenance cost, inconsistent UX.
+
+This change does two things:
+
+1. **Rebrand** from "Vibe Kanban" → "Kira Code" across all code, metadata, and docs.
+2. **Hard pivot to cloud-first** — eliminate the entire local stack (Rust daemon, local web UI, binary bootstrapper, relay tunnel client) and replace it with a minimal **Node.js agent runtime** that runs on the developer's machine, connects to the cloud over a plain WebSocket, and executes agents locally against the user's filesystem using the Pi SDK.
 
 ## What Changes
 
-- **BREAKING** — Remove all legacy executor modules (`crates/executors/src/executors/claude_code.rs`, `amp.rs`, `codex.rs`, `gemini_cli.rs`, etc.) and replace with a single `PiExecutor` that communicates via Pi's `--mode rpc` JSONL protocol.
-- **BREAKING** — Rebrand from "Vibe Kanban" to "Kira Code" across all user-facing strings, metadata, package names, and documentation.
-- Implement the **Kira-Pi Bridge**: a Rust struct (`PiExecutor`) that manages `pi` process lifecycle, reads JSONL events from stdout, and maps them to Kira's frontend state (thinking blocks, tool calls, diff views, progress).
-- Add **steering support**: relay interruption/guidance messages from the Kira UI back into the running `pi` process via stdin.
-- **Silent Pi install**: bundle the `pi` binary inside the existing Kira npx-cli download artifact (same mechanism as `kira-code-mcp`). Users never install or manage `pi` manually — Kira treats it as an internal managed service.
-- Agent execution remains **local** (runs on the developer's machine via `crates/server`), connected to the cloud UI through the existing `relay-tunnel` infrastructure.
-- Shift primary UI/auth focus from `packages/local-web` + `crates/server` to `packages/remote-web` + `crates/remote`.
-- Introduce an **Auth layer** (trusted API key / OIDC) to replace the current no-auth local model.
-- Plan migration path from SQLite to PostgreSQL for multi-tenant scalability.
-- Design a **Kira Pi Extension** (TypeScript): a custom Pi extension that exposes Kira-specific tools to the agent (`update_task_status`, `request_human_review`, `log_to_kanban`).
-- Introduce **Pi Fleet Config**: a centralized store in Kira where org admins manage the Pi skills, extensions, and model settings used by every agent run. Skills live in a Kira-managed private git repo per org; `PiExecutor` materializes a `settings.json` pointing at that repo before spawning `pi`, so Pi clones/pulls the skills natively. Every developer on the team gets identical agent capabilities without any local configuration.
+- **BREAKING** — Remove all legacy executor modules (`claude_code.rs`, `amp.rs`, `codex.rs`, `gemini_cli.rs`, etc.).
+- **BREAKING** — Delete `crates/server` (local Rust HTTP server), `crates/deployment`, `crates/local-deployment`, `crates/db` (local SQLite), `packages/local-web` (local React UI), and `npx-cli/` (binary bootstrapper). These are replaced entirely.
+- **BREAKING** — Delete the relay tunnel client (`crates/relay-tunnel` client.rs, `crates/relay-control`). The relay infrastructure was built to expose a local HTTP server to the cloud. There is no local HTTP server anymore.
+- Implement **`packages/agent-runtime`** — a pure Node.js package (TypeScript) that becomes the new `npx kira-code` entrypoint. It opens a persistent outbound WebSocket to the Kira cloud backend, waits for agent run commands, and executes them using `@mariozechner/pi-coding-agent` SDK.
+- Implement **`packages/pi-base`** — an npm package bundling all base skills, the Kira extension (with tools that call back to the cloud API), and prompt templates. `agent-runtime` depends on it. This is the v1 "fleet config" — versioned and distributed via npm, no git hosting required.
+- **Agent execution remains local** — the Pi SDK runs on the developer's machine, accesses their filesystem directly, and streams all events back to the cloud UI through the WebSocket connection.
+- Add a **WebSocket agent endpoint** to `crates/remote`: `WS /v1/agent/connect` — authenticated, persistent, bidirectional. The cloud backend routes `start_agent`, `steer`, and `abort` messages to the connected local runtime, and receives Pi SDK events back for storage and fan-out to the UI.
+- Shift all UI/auth/data to `packages/remote-web` + `crates/remote` as the sole production stack.
+- Rebrand all user-facing strings, package names, and documentation.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `pi-executor`: Rust backend integration with the Pi RPC runtime — silent binary management, process lifecycle, JSONL event parsing, stdin/stdout bridge, and steering support.
-- `kira-pi-extension`: TypeScript Pi extension exposing Kira-specific agent tools (`update_task_status`, `request_human_review`, `log_to_kanban`).
-- `pi-fleet-config`: Centralized org-level Pi configuration store — git-backed skill repo per org, model/extension settings, materialized into each worktree before agent spawn so all team members use identical Pi capabilities.
-- `cloud-auth`: Auth layer for multi-tenant remote deployments (API key + OIDC support).
-- `rebrand`: Rename from "Vibe Kanban" → "Kira Code" across all code, assets, docs, and metadata.
+- `agent-runtime`: Node.js local agent runtime — Pi SDK integration, outbound WebSocket to cloud, session lifecycle management, worktree management.
+- `pi-base`: Bundled npm package containing base skills, Kira extension tools (`update_task_status`, `request_human_review`, `log_to_kanban`), and prompt templates. Versioned with Kira releases.
+- `cloud-agent-ws`: WebSocket endpoint in `crates/remote` for agent runtime ↔ cloud communication. Handles authentication, message routing, and event persistence.
+- `rebrand`: Rename "Vibe Kanban" → "Kira Code" across all code, assets, docs, and metadata.
+
+### Removed Capabilities
+
+- `local-stack`: `crates/server`, `crates/deployment`, `crates/local-deployment`, `crates/db`, `packages/local-web`, `npx-cli/` — all deleted.
+- `relay-tunnel-client`: `relay_tunnel::client`, `crates/relay-control` — deleted. The relay server binary (`crates/relay-tunnel` server-bin) is also removed as it has no remaining purpose.
+- `legacy-executors`: All per-agent executor modules — deleted.
 
 ### Modified Capabilities
 
-<!-- No existing spec-level capabilities are being changed; all prior specs are greenfield. -->
+- `cloud-auth`: Auth layer already present in `crates/remote`; extended to cover the new agent WebSocket endpoint.
 
 ## Impact
 
-- **`npx-cli/`** — `pi` npm package bundled alongside `kira-code` and `kira-code-mcp` in the R2 download artifact; `ensureBinary` extended to extract and version-check `pi` at startup.
-- **`crates/executors/`** — Major refactor: legacy executor files deleted, `PiExecutor` added, `ExecutorFactory` simplified to single backend. `PiExecutor` resolves `pi` from the managed cache path (`~/.kira/bin/pi`), not `PATH`.
-- **`crates/server/` & `crates/remote/`** — New process-management routes and WebSocket/SSE streaming for Pi JSONL events; auth middleware added to remote stack; fleet config API (CRUD for org Pi settings + skill repo management).
-- **`crates/git` / `crates/git-host`** — Extended to provision and manage per-org skill git repos; Kira acts as a lightweight git host for skill content.
-- **`packages/web-core/`** — New UI state for Pi event types (thinking blocks, tool call cards, diff viewer); steering/interrupt UX.
-- **`packages/remote-web/`** — Primary focus of frontend work going forward; updated branding.
-- **`packages/local-web/`** — Deprioritized; kept functional but receives no new features.
-- **Dependencies** — Pi bundled as a versioned npm artifact (no runtime npm install); PostgreSQL driver (`sqlx` feature flag) added; OIDC library TBD.
-- **Docs & Assets** — All "Vibe Kanban" references replaced with "Kira Code".
+- **`npx kira-code`** — now runs `packages/agent-runtime` directly (Node.js, no binary download). No platform detection, no R2 downloads, no zip extraction.
+- **`crates/remote/`** — new `WS /v1/agent/connect` endpoint; new agent session state management; event persistence and fan-out to UI WebSocket subscribers.
+- **`packages/remote-web/`** — new agent run UI: thinking blocks, tool call cards, diff viewer, steering input. Primary frontend going forward.
+- **`packages/web-core/`** — shared agent event rendering components.
+- **`packages/agent-runtime/`** — new package. Pi SDK wrapper, WebSocket client, worktree management, session lifecycle.
+- **`packages/pi-base/`** — new package. Skills, Kira extension, prompts.
+- **Deletions** — `crates/server`, `crates/deployment`, `crates/local-deployment`, `crates/db`, `crates/relay-control`, `crates/relay-tunnel` (entire crate), `packages/local-web`, `npx-cli/`.
+- **Docs & Assets** — all "Vibe Kanban" references replaced with "Kira Code".

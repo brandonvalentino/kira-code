@@ -1,11 +1,11 @@
+use aide::axum::{ApiRouter, routing::get};
 use axum::{
-    Router,
     extract::{Query, State},
     response::Json as ResponseJson,
-    routing::get,
 };
 use db::models::repo::{Repo, SearchResult};
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::file_search::{SearchMode, SearchQuery};
 use utils::response::ApiResponse;
@@ -13,7 +13,7 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct MultiRepoSearchQuery {
     pub q: String,
     #[serde(default)]
@@ -68,8 +68,12 @@ pub async fn search_files(
     Ok(ResponseJson(ApiResponse::success(results)))
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/search", get(search_files))
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/search", get(search_files))
         .with_state(deployment.clone())
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new().api_route("/search", get(search_files))
 }

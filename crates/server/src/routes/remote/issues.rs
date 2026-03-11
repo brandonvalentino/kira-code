@@ -1,25 +1,25 @@
+use aide::axum::{ApiRouter, routing::get};
 use api_types::{
     CreateIssueRequest, Issue, ListIssuesResponse, MutationResponse, UpdateIssueRequest,
 };
 use axum::{
-    Router,
     extract::{Json, Path, Query, State},
     response::Json as ResponseJson,
-    routing::get,
 };
+use schemars::JsonSchema;
 use serde::Deserialize;
 use utils::response::ApiResponse;
 use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ListIssuesQuery {
     pub project_id: Uuid,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
         .route("/issues", get(list_issues).post(create_issue))
         .route(
             "/issues/{issue_id}",

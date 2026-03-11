@@ -5,6 +5,7 @@ use executors::{
     actions::{ExecutorAction, ExecutorActionType},
     profile::ExecutorProfileId,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{FromRow, SqlitePool, Type};
@@ -36,7 +37,7 @@ pub enum ExecutionProcessError {
     ValidationError(String),
 }
 
-#[derive(Debug, Clone, Type, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Type, Serialize, Deserialize, PartialEq, TS, JsonSchema)]
 #[sqlx(type_name = "execution_process_status", rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]
 #[ts(use_ts_enum)]
@@ -47,7 +48,7 @@ pub enum ExecutionProcessStatus {
     Killed,
 }
 
-#[derive(Debug, Clone, Type, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Type, Serialize, Deserialize, PartialEq, TS, JsonSchema)]
 #[sqlx(type_name = "execution_process_run_reason", rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]
 pub enum ExecutionProcessRunReason {
@@ -58,12 +59,13 @@ pub enum ExecutionProcessRunReason {
     DevServer,
 }
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS, schemars::JsonSchema)]
 pub struct ExecutionProcess {
     pub id: Uuid,
     pub session_id: Uuid,
     pub run_reason: ExecutionProcessRunReason,
     #[ts(type = "ExecutorAction")]
+    #[schemars(with = "serde_json::Value")]
     pub executor_action: sqlx::types::Json<ExecutorActionField>,
     pub status: ExecutionProcessStatus,
     pub exit_code: Option<i64>,

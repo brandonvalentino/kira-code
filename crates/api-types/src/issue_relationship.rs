@@ -16,7 +16,7 @@ pub enum IssueRelationshipType {
     HasDuplicate,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct IssueRelationship {
     pub id: Uuid,
     pub issue_id: Uuid,
@@ -25,7 +25,7 @@ pub struct IssueRelationship {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CreateIssueRelationshipRequest {
     /// Optional client-generated ID. If not provided, server generates one.
     /// Using client-generated IDs enables stable optimistic updates.
@@ -36,7 +36,7 @@ pub struct CreateIssueRelationshipRequest {
     pub relationship_type: IssueRelationshipType,
 }
 
-#[derive(Debug, Clone, Deserialize, TS)]
+#[derive(Debug, Clone, Deserialize, TS, JsonSchema)]
 pub struct UpdateIssueRelationshipRequest {
     #[serde(default, deserialize_with = "some_if_present")]
     pub related_issue_id: Option<Uuid>,
@@ -44,12 +44,12 @@ pub struct UpdateIssueRelationshipRequest {
     pub relationship_type: Option<IssueRelationshipType>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct ListIssueRelationshipsQuery {
     pub issue_id: Uuid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ListIssueRelationshipsResponse {
     pub issue_relationships: Vec<IssueRelationship>,
 }

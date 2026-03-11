@@ -1,10 +1,15 @@
-use axum::{Extension, Json, Router, extract::State, response::Json as ResponseJson, routing::get};
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
+use axum::{Extension, Json, extract::State, response::Json as ResponseJson};
 use db::models::{
     requests::WorkspaceRepoInput,
     workspace::{Workspace, WorkspaceError},
     workspace_repo::{RepoWithTargetBranch, WorkspaceRepo},
 };
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::container::ContainerService;
 use ts_rs::TS;
@@ -13,20 +18,20 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct AddWorkspaceRepoRequest {
     pub repo_id: Uuid,
     pub target_branch: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct AddWorkspaceRepoResponse {
     pub workspace: Workspace,
     pub repo: RepoWithTargetBranch,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new().route("/", get(get_workspace_repos).post(add_workspace_repo))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new().api_route("/", get(get_workspace_repos).post(add_workspace_repo))
 }
 
 pub async fn get_workspace_repos(

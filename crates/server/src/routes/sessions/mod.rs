@@ -1,12 +1,15 @@
 pub mod queue;
 pub mod review;
 
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use axum::{
-    Extension, Json, Router,
+    Extension, Json,
     extract::{Query, State},
     middleware::from_fn_with_state,
     response::Json as ResponseJson,
-    routing::{get, post},
 };
 use db::models::{
     coding_agent_turn::CodingAgentTurn,
@@ -23,6 +26,7 @@ use executors::{
     },
     profile::ExecutorConfig,
 };
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::container::ContainerService;
 use ts_rs::TS;
@@ -34,12 +38,12 @@ use crate::{
     routes::workspaces::execution::RunScriptError,
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct SessionQuery {
     pub workspace_id: Uuid,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct CreateSessionRequest {
     pub workspace_id: Uuid,
     pub executor: Option<String>,
@@ -86,7 +90,7 @@ pub async fn create_session(
     Ok(ResponseJson(ApiResponse::success(session)))
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct CreateFollowUpAttempt {
     pub prompt: String,
     pub executor_config: ExecutorConfig,
@@ -95,7 +99,7 @@ pub struct CreateFollowUpAttempt {
     pub perform_git_reset: Option<bool>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct ResetProcessRequest {
     pub process_id: Uuid,
     pub force_when_dirty: Option<bool>,
@@ -292,22 +296,38 @@ pub async fn run_setup_script(
     Ok(ResponseJson(ApiResponse::success(execution_process)))
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    let session_id_router = Router::new()
-        .route("/", get(get_session))
-        .route("/follow-up", post(follow_up))
-        .route("/reset", post(reset_process))
-        .route("/setup", post(run_setup_script))
-        .route("/review", post(review::start_review))
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    let session_id_router = ApiRouter::new()
+        .api_route("/", get(get_session))
+        .api_route("/follow-up", post(follow_up))
+        .api_route("/reset", post(reset_process))
+        .api_route("/setup", post(run_setup_script))
+        .api_route("/review", post(review::start_review))
         .layer(from_fn_with_state(
             deployment.clone(),
             load_session_middleware,
         ));
 
-    let sessions_router = Router::new()
-        .route("/", get(get_sessions).post(create_session))
+    let sessions_router = ApiRouter::new()
+        .api_route("/", get(get_sessions).post(create_session))
         .nest("/{session_id}", session_id_router)
         .nest("/{session_id}/queue", queue::router(deployment));
 
-    Router::new().nest("/sessions", sessions_router)
+    ApiRouter::new().nest("/sessions", sessions_router)
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    let session_id_router = ApiRouter::new()
+        .api_route("/", get(get_session))
+        .api_route("/follow-up", post(follow_up))
+        .api_route("/reset", post(reset_process))
+        .api_route("/setup", post(run_setup_script))
+        .api_route("/review", post(review::start_review))
+        .nest("/{session_id}/queue", queue::router_for_spec());
+
+    let sessions_router = ApiRouter::new()
+        .api_route("/", get(get_sessions).post(create_session))
+        .nest("/{session_id}", session_id_router);
+
+    ApiRouter::new().nest("/sessions", sessions_router)
 }

@@ -4,6 +4,7 @@ use axum::{
     response::IntoResponse,
 };
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::container::ContainerService;
 
@@ -12,13 +13,13 @@ use crate::{
     routes::relay_ws::{SignedWebSocket, SignedWsUpgrade},
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct DiffStreamQuery {
     #[serde(default)]
     pub stats_only: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct WorkspaceStreamQuery {
     pub archived: Option<bool>,
     pub limit: Option<i64>,

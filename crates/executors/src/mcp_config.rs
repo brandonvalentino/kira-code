@@ -9,6 +9,7 @@ use jsonc_parser::{
     ParseOptions,
     cst::{CstObject, CstRootNode},
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use tokio::fs;
@@ -27,7 +28,7 @@ pub static PRECONFIGURED_MCP_SERVERS: LazyLock<Value> = LazyLock::new(|| {
     serde_json::from_str::<Value>(DEFAULT_MCP_JSON).expect("Failed to parse default MCP JSON")
 });
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct McpConfig {
     servers: HashMap<String, serde_json::Value>,
     pub servers_path: Vec<String>,

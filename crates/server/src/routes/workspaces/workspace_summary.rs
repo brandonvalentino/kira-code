@@ -8,6 +8,7 @@ use db::models::{
     workspace::Workspace,
 };
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use utils::response::ApiResponse;
@@ -16,13 +17,13 @@ use uuid::Uuid;
 use crate::{DeploymentImpl, error::ApiError};
 
 /// Request for fetching workspace summaries
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct WorkspaceSummaryRequest {
     pub archived: bool,
 }
 
 /// Summary info for a single workspace
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct WorkspaceSummary {
     pub workspace_id: Uuid,
     /// Session ID of the latest execution process
@@ -53,12 +54,12 @@ pub struct WorkspaceSummary {
 }
 
 /// Response containing summaries for requested workspaces
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct WorkspaceSummaryResponse {
     pub summaries: Vec<WorkspaceSummary>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, TS)]
+#[derive(Debug, Clone, Default, Serialize, TS, JsonSchema)]
 pub struct DiffStats {
     pub files_changed: usize,
     pub lines_added: usize,

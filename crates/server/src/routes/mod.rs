@@ -1,3 +1,4 @@
+use aide::axum::ApiRouter;
 use axum::{
     Router,
     routing::{IntoMakeService, get},
@@ -32,27 +33,65 @@ pub mod terminal;
 pub mod workspaces;
 
 pub fn router(deployment: DeploymentImpl) -> IntoMakeService<Router> {
+    // Build OpenAPI spec once at startup
+    let mut api = aide::openapi::OpenApi::default();
+    crate::openapi::build_api(&mut api);
+
     let relay_signed_routes = Router::new()
-        .route("/health", get(health::health_check))
-        .merge(config::router())
-        .merge(containers::router(&deployment))
-        .merge(workspaces::router(&deployment))
-        .merge(execution_processes::router(&deployment))
-        .merge(tags::router(&deployment))
-        .merge(oauth::router())
-        .merge(organizations::router())
-        .merge(filesystem::router())
-        .merge(repo::router())
-        .merge(events::router(&deployment))
-        .merge(approvals::router())
-        .merge(scratch::router(&deployment))
-        .merge(search::router(&deployment))
-        .merge(releases::router())
-        .merge(migration::router())
-        .merge(sessions::router(&deployment))
-        .merge(terminal::router())
-        .nest("/remote", remote::router())
-        .nest("/images", images::routes())
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(health::router()))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(config::router()))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            containers::router(&deployment),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            workspaces::router(&deployment),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            execution_processes::router(&deployment),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(tags::router(
+            &deployment,
+        )))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(oauth::router()))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            organizations::router(),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            filesystem::router(),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(repo::router()))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(events::router(
+            &deployment,
+        )))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            approvals::router(),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(scratch::router(
+            &deployment,
+        )))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(search::router(
+            &deployment,
+        )))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            releases::router(),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            migration::router(),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            sessions::router(&deployment),
+        ))
+        .merge(Into::<axum::Router<DeploymentImpl>>::into(
+            terminal::router(),
+        ))
+        .nest(
+            "/remote",
+            Into::<axum::Router<DeploymentImpl>>::into(remote::router()),
+        )
+        .nest(
+            "/images",
+            Into::<axum::Router<DeploymentImpl>>::into(images::routes()),
+        )
         .layer(axum::middleware::from_fn_with_state(
             deployment.clone(),
             middleware::sign_relay_response,
@@ -66,6 +105,25 @@ pub fn router(deployment: DeploymentImpl) -> IntoMakeService<Router> {
     let api_routes = Router::new()
         .merge(relay_auth::router())
         .merge(relay_signed_routes)
+        // Serve OpenAPI spec JSON
+        .route(
+            "/openapi.json",
+            get(
+                |axum::Extension(api): axum::Extension<aide::openapi::OpenApi>| async move {
+                    axum::Json(api)
+                },
+            ),
+        )
+        // Serve Swagger UI at /api/docs
+        .route("/docs", {
+            let r: axum::routing::MethodRouter<DeploymentImpl> =
+                aide::swagger::Swagger::new("/api/openapi.json")
+                    .with_title("Kira Code API")
+                    .axum_route()
+                    .into();
+            r
+        })
+        .layer(axum::Extension(api))
         .layer(ValidateRequestHeaderLayer::custom(
             middleware::validate_origin,
         ))
@@ -76,4 +134,32 @@ pub fn router(deployment: DeploymentImpl) -> IntoMakeService<Router> {
         .route("/{*path}", get(frontend::serve_frontend))
         .nest("/api", api_routes)
         .into_make_service()
+}
+
+/// Builds a full ApiRouter for OpenAPI spec generation.
+/// Uses router_for_spec() variants (no middleware) for routers that require DeploymentImpl.
+/// aide only reads the route tree structure — middleware is not needed for spec generation.
+pub fn api_router_for_spec() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .merge(health::router())
+        .merge(config::router())
+        .merge(containers::router_for_spec())
+        .merge(workspaces::router_for_spec())
+        .merge(execution_processes::router_for_spec())
+        .merge(tags::router_for_spec())
+        .merge(oauth::router())
+        .merge(organizations::router())
+        .merge(filesystem::router())
+        .merge(repo::router())
+        .merge(events::router_for_spec())
+        .merge(approvals::router())
+        .merge(scratch::router_for_spec())
+        .merge(search::router_for_spec())
+        .merge(releases::router())
+        .merge(migration::router())
+        .merge(sessions::router_for_spec())
+        .merge(terminal::router())
+        .merge(relay_auth::router())
+        .nest("/remote", remote::router())
+        .nest("/images", images::routes())
 }

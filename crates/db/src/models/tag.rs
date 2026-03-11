@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use ts_rs::TS;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS, JsonSchema)]
 pub struct Tag {
     pub id: Uuid,
     pub tag_name: String,
@@ -13,13 +14,13 @@ pub struct Tag {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct CreateTag {
     pub tag_name: String,
     pub content: String,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct UpdateTag {
     pub tag_name: Option<String>,
     pub content: Option<String>,

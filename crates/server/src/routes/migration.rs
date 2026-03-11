@@ -1,8 +1,11 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use axum::{
-    Router,
     extract::{Json, State},
     response::Json as ResponseJson,
-    routing::{get, post},
+    routing::get as axum_get,
 };
 use db::models::project::Project;
 use deployment::Deployment;
@@ -11,10 +14,10 @@ use utils::response::ApiResponse;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/migration/start", post(start_migration))
-        .route("/migration/projects", get(list_projects))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/migration/start", post(start_migration))
+        .route("/migration/projects", axum_get(list_projects))
 }
 
 async fn start_migration(

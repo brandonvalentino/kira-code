@@ -3,8 +3,10 @@ use std::{
     time::{Duration, Instant},
 };
 
-use axum::{Router, response::Json as ResponseJson, routing::get};
+use aide::axum::{ApiRouter, routing::get};
+use axum::response::Json as ResponseJson;
 use reqwest::Client;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
@@ -31,11 +33,11 @@ fn cache() -> &'static RwLock<Option<(Vec<GitHubRelease>, Instant)>> {
     RELEASES_CACHE.get_or_init(|| RwLock::new(None))
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new().route("/releases", get(get_releases))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new().api_route("/releases", get(get_releases))
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
 pub struct GitHubRelease {
     pub name: String,
     pub tag_name: String,
@@ -43,7 +45,7 @@ pub struct GitHubRelease {
     pub body: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 struct ReleasesResponse {
     releases: Vec<GitHubRelease>,
 }

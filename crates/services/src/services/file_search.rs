@@ -12,6 +12,7 @@ use ignore::WalkBuilder;
 use moka::future::Cache;
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_full::{DebounceEventResult, new_debouncer};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tokio::sync::mpsc;
@@ -21,9 +22,8 @@ use ts_rs::TS;
 use super::file_ranker::{FileRanker, FileStats};
 
 /// Search mode for different use cases
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema, Default)]
 #[serde(rename_all = "lowercase")]
-#[derive(Default)]
 pub enum SearchMode {
     #[default]
     TaskForm, // Default: exclude ignored files (clean results)

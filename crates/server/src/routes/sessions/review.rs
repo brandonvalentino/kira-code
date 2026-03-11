@@ -17,6 +17,7 @@ use executors::{
     executors::build_review_prompt,
     profile::ExecutorConfig,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::container::ContainerService;
 use ts_rs::TS;
@@ -24,7 +25,7 @@ use utils::response::ApiResponse;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct StartReviewRequest {
     pub executor_config: ExecutorConfig,
     pub additional_prompt: Option<String>,
@@ -32,7 +33,7 @@ pub struct StartReviewRequest {
     pub use_all_workspace_commits: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum ReviewError {

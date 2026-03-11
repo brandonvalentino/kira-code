@@ -1,3 +1,7 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{delete, get, put},
+};
 use axum::{
     Extension, Json,
     extract::{Query, State},
@@ -10,6 +14,7 @@ use db::models::{
     workspace::{Workspace, WorkspaceError},
 };
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::{container::ContainerService, diff_stream, remote_sync};
 use sqlx::Error as SqlxError;
@@ -18,7 +23,7 @@ use workspace_manager::WorkspaceManager;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct DeleteWorkspaceQuery {
     #[serde(default)]
     pub delete_remote: bool,

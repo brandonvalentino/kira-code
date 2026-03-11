@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use ts_rs::TS;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ProviderKind {
     GitHub,
@@ -68,12 +69,12 @@ impl GitHostError {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct PrCommentAuthor {
     pub login: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct PrComment {
     pub id: String,
@@ -84,12 +85,12 @@ pub struct PrComment {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ReviewCommentUser {
     pub login: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct PrReviewComment {
     pub id: i64,
     pub user: ReviewCommentUser,
@@ -103,7 +104,7 @@ pub struct PrReviewComment {
     pub author_association: String,
 }
 
-#[derive(Debug, Clone, Serialize, TS)]
+#[derive(Debug, Clone, Serialize, TS, JsonSchema)]
 #[serde(tag = "comment_type", rename_all = "snake_case")]
 #[ts(tag = "comment_type", rename_all = "snake_case")]
 pub enum UnifiedPrComment {
@@ -138,7 +139,7 @@ impl UnifiedPrComment {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct OpenPrInfo {
     pub number: i64,
     pub url: String,

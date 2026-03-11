@@ -1,13 +1,17 @@
 use std::time::Duration;
 
+use aide::axum::{
+    ApiRouter,
+    routing::{delete, get, post},
+};
 use axum::{
-    Json, Router,
+    Json,
     extract::{Json as ExtractJson, Path, State},
     http::HeaderMap,
-    routing::{delete, get, post},
 };
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64_STANDARD};
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use trusted_key_auth::{
     key_confirmation::{build_server_proof, verify_client_proof},
@@ -27,24 +31,24 @@ const SPAKE2_START_GLOBAL_LIMIT: usize = 30;
 const SIGNING_SESSION_REFRESH_GLOBAL_LIMIT: usize = 30;
 const RELAY_HEADER: &str = "x-vk-relayed";
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 struct GenerateEnrollmentCodeResponse {
     enrollment_code: String,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct StartSpake2EnrollmentRequest {
     enrollment_code: String,
     client_message_b64: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct StartSpake2EnrollmentResponse {
     enrollment_id: Uuid,
     server_message_b64: String,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct FinishSpake2EnrollmentRequest {
     enrollment_id: Uuid,
     client_id: Uuid,
@@ -56,14 +60,14 @@ pub struct FinishSpake2EnrollmentRequest {
     client_proof_b64: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct FinishSpake2EnrollmentResponse {
     signing_session_id: Uuid,
     server_public_key_b64: String,
     server_proof_b64: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct RelayPairedClient {
     client_id: Uuid,
     client_name: String,
@@ -72,17 +76,17 @@ pub struct RelayPairedClient {
     client_device: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct ListRelayPairedClientsResponse {
     clients: Vec<RelayPairedClient>,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct RemoveRelayPairedClientResponse {
     removed: bool,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct RefreshRelaySigningSessionRequest {
     client_id: Uuid,
     timestamp: i64,
@@ -90,28 +94,28 @@ pub struct RefreshRelaySigningSessionRequest {
     signature_b64: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct RefreshRelaySigningSessionResponse {
     signing_session_id: Uuid,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route(
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route(
             "/relay-auth/enrollment-code",
             post(generate_enrollment_code),
         )
-        .route("/relay-auth/clients", get(list_relay_paired_clients))
-        .route(
+        .api_route("/relay-auth/clients", get(list_relay_paired_clients))
+        .api_route(
             "/relay-auth/clients/{client_id}",
             delete(remove_relay_paired_client),
         )
-        .route(
+        .api_route(
             "/relay-auth/spake2/start",
             post(start_spake2_enrollment_route),
         )
-        .route("/relay-auth/spake2/finish", post(finish_spake2_enrollment))
-        .route(
+        .api_route("/relay-auth/spake2/finish", post(finish_spake2_enrollment))
+        .api_route(
             "/relay-auth/signing-session/refresh",
             post(refresh_relay_signing_session),
         )

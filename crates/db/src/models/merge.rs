@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool, Type};
 use ts_rs::TS;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, Type, JsonSchema)]
 #[sqlx(type_name = "merge_status", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum MergeStatus {
@@ -16,14 +17,14 @@ pub enum MergeStatus {
     Unknown,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Merge {
     Direct(DirectMerge),
     Pr(PrMerge),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct DirectMerge {
     pub id: Uuid,
     pub workspace_id: Uuid,
@@ -34,7 +35,7 @@ pub struct DirectMerge {
 }
 
 /// PR merge - represents a pull request merge
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct PrMerge {
     pub id: Uuid,
     pub workspace_id: Uuid,
@@ -44,7 +45,7 @@ pub struct PrMerge {
     pub pr_info: PullRequestInfo,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct PullRequestInfo {
     pub number: i64,
     pub url: String,

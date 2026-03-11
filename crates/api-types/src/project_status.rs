@@ -1,11 +1,12 @@
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use uuid::Uuid;
 
 use crate::some_if_present;
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ProjectStatus {
     pub id: Uuid,
     pub project_id: Uuid,
@@ -16,7 +17,7 @@ pub struct ProjectStatus {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Deserialize, TS)]
+#[derive(Debug, Clone, Deserialize, TS, JsonSchema)]
 pub struct CreateProjectStatusRequest {
     /// Optional client-generated ID. If not provided, server generates one.
     /// Using client-generated IDs enables stable optimistic updates.
@@ -29,7 +30,7 @@ pub struct CreateProjectStatusRequest {
     pub hidden: bool,
 }
 
-#[derive(Debug, Clone, Deserialize, TS)]
+#[derive(Debug, Clone, Deserialize, TS, JsonSchema)]
 pub struct UpdateProjectStatusRequest {
     #[serde(default, deserialize_with = "some_if_present")]
     pub name: Option<String>,
@@ -46,7 +47,7 @@ pub struct ListProjectStatusesQuery {
     pub project_id: Uuid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ListProjectStatusesResponse {
     pub project_statuses: Vec<ProjectStatus>,
 }

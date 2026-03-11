@@ -1,10 +1,11 @@
+use aide::axum::{ApiRouter, routing::get};
 use axum::{
-    Extension, Json, Router, extract::State, middleware::from_fn_with_state,
-    response::Json as ResponseJson, routing::get,
+    Extension, Json, extract::State, middleware::from_fn_with_state, response::Json as ResponseJson,
 };
 use db::models::{scratch::DraftFollowUpData, session::Session};
 use deployment::Deployment;
 use executors::profile::ExecutorConfig;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::queued_message::QueueStatus;
 use ts_rs::TS;
@@ -13,7 +14,7 @@ use utils::response::ApiResponse;
 use crate::{DeploymentImpl, error::ApiError, middleware::load_session_middleware};
 
 /// Request body for queueing a follow-up message
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct QueueMessageRequest {
     pub message: String,
     pub executor_config: ExecutorConfig,
@@ -81,9 +82,9 @@ pub async fn get_queue_status(
     Ok(ResponseJson(ApiResponse::success(status)))
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    Router::new()
-        .route(
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route(
             "/",
             get(get_queue_status)
                 .post(queue_message)
@@ -93,4 +94,13 @@ pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
             deployment.clone(),
             load_session_middleware,
         ))
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new().api_route(
+        "/",
+        get(get_queue_status)
+            .post(queue_message)
+            .delete(cancel_queued_message),
+    )
 }

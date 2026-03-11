@@ -1,23 +1,23 @@
+use aide::axum::{ApiRouter, routing::get};
 use api_types::{ListTagsResponse, Tag};
 use axum::{
-    Router,
     extract::{Path, Query, State},
     response::Json as ResponseJson,
-    routing::get,
 };
+use schemars::JsonSchema;
 use serde::Deserialize;
 use utils::response::ApiResponse;
 use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ListTagsQuery {
     pub project_id: Uuid,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
         .route("/tags", get(list_tags))
         .route("/tags/{tag_id}", get(get_tag))
 }

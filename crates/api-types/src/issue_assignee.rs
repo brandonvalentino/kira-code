@@ -1,11 +1,12 @@
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use uuid::Uuid;
 
 use crate::some_if_present;
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct IssueAssignee {
     pub id: Uuid,
     pub issue_id: Uuid,
@@ -13,7 +14,7 @@ pub struct IssueAssignee {
     pub assigned_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CreateIssueAssigneeRequest {
     /// Optional client-generated ID. If not provided, server generates one.
     /// Using client-generated IDs enables stable optimistic updates.
@@ -23,7 +24,7 @@ pub struct CreateIssueAssigneeRequest {
     pub user_id: Uuid,
 }
 
-#[derive(Debug, Clone, Deserialize, TS)]
+#[derive(Debug, Clone, Deserialize, TS, JsonSchema)]
 pub struct UpdateIssueAssigneeRequest {
     #[serde(default, deserialize_with = "some_if_present")]
     pub user_id: Option<Uuid>,
@@ -34,7 +35,7 @@ pub struct ListIssueAssigneesQuery {
     pub issue_id: Uuid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ListIssueAssigneesResponse {
     pub issue_assignees: Vec<IssueAssignee>,
 }

@@ -1,4 +1,5 @@
 use convert_case::{Case, Casing};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -47,7 +48,7 @@ pub struct AgentInfo {
 }
 
 /// Permission policy for tool operations
-#[derive(Debug, Clone, Serialize, Deserialize, TS, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, PartialEq, Eq, Default, JsonSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(use_ts_enum)]
 pub enum PermissionPolicy {

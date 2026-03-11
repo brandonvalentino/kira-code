@@ -1,16 +1,20 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{delete, post},
+};
 use api_types::{CreateWorkspaceRequest, PullRequestStatus, UpsertPullRequestRequest};
 use axum::{
-    Extension, Json, Router,
+    Extension, Json,
     extract::{Path as AxumPath, State},
     middleware::from_fn_with_state,
     response::Json as ResponseJson,
-    routing::{delete, post},
 };
 use db::models::{
     merge::{Merge, MergeStatus},
     workspace::Workspace,
 };
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::{diff_stream, remote_client::RemoteClientError, remote_sync};
 use utils::response::ApiResponse;
@@ -18,7 +22,7 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError, middleware::load_workspace_middleware};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct LinkWorkspaceRequest {
     pub project_id: Uuid,
     pub issue_id: Uuid,
@@ -107,15 +111,22 @@ pub async fn unlink_workspace(
     }
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    let post_router = Router::new()
-        .route("/", post(link_workspace))
-        .layer(from_fn_with_state(
-            deployment.clone(),
-            load_workspace_middleware,
-        ));
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    let post_router =
+        ApiRouter::new()
+            .api_route("/", post(link_workspace))
+            .layer(from_fn_with_state(
+                deployment.clone(),
+                load_workspace_middleware,
+            ));
 
-    let delete_router = Router::new().route("/", delete(unlink_workspace));
+    let delete_router = ApiRouter::new().api_route("/", delete(unlink_workspace));
 
     post_router.merge(delete_router)
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/", post(link_workspace))
+        .merge(ApiRouter::new().api_route("/", delete(unlink_workspace)))
 }

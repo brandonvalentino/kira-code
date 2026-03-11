@@ -541,3 +541,7 @@ impl From<RepoServiceError> for ApiError {
         }
     }
 }
+
+impl aide::OperationOutput for ApiError {
+    type Inner = Self;
+}

@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use anyhow::Error;
 use executors::{executors::BaseCodingAgent, profile::ExecutorProfileId};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use utils;
@@ -9,7 +10,7 @@ pub use v5::{EditorConfig, EditorType, GitHubConfig, NotificationConfig, SoundFi
 
 use crate::services::config::versions::v5;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, TS, Default)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, TS, Default, JsonSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum UiLanguage {
     #[default]

@@ -1,17 +1,16 @@
+use aide::axum::{ApiRouter, routing::get};
 use api_types::Workspace;
 use axum::{
-    Router,
     extract::{Path, State},
     response::Json as ResponseJson,
-    routing::get,
 };
 use utils::response::ApiResponse;
 use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new().route(
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new().route(
         "/workspaces/by-local-id/{local_workspace_id}",
         get(get_workspace_by_local_id),
     )

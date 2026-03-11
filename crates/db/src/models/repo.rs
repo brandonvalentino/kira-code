@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_with::rust::double_option;
 use sqlx::{Executor, FromRow, Sqlite, SqlitePool};
@@ -8,7 +9,7 @@ use thiserror::Error;
 use ts_rs::TS;
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct SearchResult {
     pub path: String,
     pub is_file: bool,
@@ -18,7 +19,7 @@ pub struct SearchResult {
     pub score: i64,
 }
 
-#[derive(Debug, Clone, Serialize, TS)]
+#[derive(Debug, Clone, Serialize, TS, JsonSchema)]
 pub enum SearchMatchType {
     FileName,
     DirectoryName,
@@ -33,7 +34,7 @@ pub enum RepoError {
     NotFound,
 }
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS, schemars::JsonSchema)]
 pub struct Repo {
     pub id: Uuid,
     pub path: PathBuf,

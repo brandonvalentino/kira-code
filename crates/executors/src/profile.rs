@@ -6,6 +6,7 @@ use std::{
 };
 
 use convert_case::{Case, Casing};
+use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize, de::Error as DeError};
 use thiserror::Error;
 use ts_rs::TS;
@@ -59,7 +60,7 @@ static EXECUTOR_PROFILES_CACHE: LazyLock<RwLock<ExecutorConfigs>> =
 const DEFAULT_PROFILES_JSON: &str = include_str!("../default_profiles.json");
 
 // Executor-centric profile identifier
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, Hash, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, Hash, Eq, JsonSchema)]
 pub struct ExecutorProfileId {
     /// The executor type (e.g., "CLAUDE_CODE", "AMP")
     #[serde(alias = "profile", deserialize_with = "de_base_coding_agent_kebab")]
@@ -121,7 +122,7 @@ impl std::fmt::Display for ExecutorProfileId {
 ///
 /// This is the single object that flows through API requests, action types,
 /// scratch persistence, and frontend state whenever an executor is used.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, JsonSchema)]
 pub struct ExecutorConfig {
     /// The executor type (e.g., CLAUDE_CODE, AMP)
     #[serde(alias = "profile", deserialize_with = "de_base_coding_agent_kebab")]
@@ -192,7 +193,7 @@ impl std::fmt::Display for ExecutorConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, JsonSchema)]
 pub struct ExecutorProfile {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recently_used_models: Option<ExecutorRecentModels>,
@@ -251,7 +252,7 @@ impl ExecutorProfile {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, Default, JsonSchema)]
 pub struct ExecutorRecentModels {
     /// Ordered list of recently used model keys (most recent last).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -261,7 +262,7 @@ pub struct ExecutorRecentModels {
     pub reasoning_by_model: HashMap<String, String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS, JsonSchema)]
 pub struct ExecutorConfigs {
     pub executors: HashMap<BaseCodingAgent, ExecutorProfile>,
 }

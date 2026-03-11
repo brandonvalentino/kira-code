@@ -1,13 +1,17 @@
 use std::collections::HashMap;
 
+use aide::axum::{
+    ApiRouter,
+    routing::{get, put},
+};
 use api_types::LoginStatus;
 use axum::{
-    Json, Router,
+    Json,
     body::Body,
     extract::{Path, Query, State, ws::Message},
     http,
     response::{IntoResponse, Json as ResponseJson, Response},
-    routing::{get, put},
+    routing::get as axum_get,
 };
 use deployment::{Deployment, DeploymentError};
 use executors::{
@@ -17,6 +21,7 @@ use executors::{
     mcp_config::{McpConfig, read_agent_config, write_agent_config},
     profile::{ExecutorConfigs, ExecutorProfileId},
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use services::services::{
@@ -39,26 +44,29 @@ use crate::{
     tunnel,
 };
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/info", get(get_user_system_info))
-        .route("/config", put(update_config))
-        .route("/sounds/{sound}", get(get_sound))
-        .route("/mcp-config", get(get_mcp_servers).post(update_mcp_servers))
-        .route("/profiles", get(get_profiles).put(update_profiles))
-        .route(
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/info", get(get_user_system_info))
+        .api_route("/config", put(update_config))
+        .api_route("/sounds/{sound}", get(get_sound))
+        .api_route("/mcp-config", get(get_mcp_servers).post(update_mcp_servers))
+        .api_route("/profiles", get(get_profiles).put(update_profiles))
+        .api_route(
             "/editors/check-availability",
             get(check_editor_availability),
         )
-        .route("/agents/check-availability", get(check_agent_availability))
-        .route("/agents/preset-options", get(get_agent_preset_options))
+        .route(
+            "/agents/check-availability",
+            axum_get(check_agent_availability),
+        )
+        .api_route("/agents/preset-options", get(get_agent_preset_options))
         .route(
             "/agents/discovered-options/ws",
-            get(stream_executor_discovered_options_ws),
+            axum_get(stream_executor_discovered_options_ws),
         )
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct Environment {
     pub os_type: String,
     pub os_version: String,
@@ -84,7 +92,7 @@ impl Environment {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct UserSystemInfo {
     pub version: String,
     pub config: Config,
@@ -235,19 +243,19 @@ async fn get_sound(Path(sound): Path<SoundFile>) -> Result<Response, ApiError> {
     Ok(response)
 }
 
-#[derive(TS, Debug, Deserialize)]
+#[derive(TS, Debug, Deserialize, JsonSchema)]
 pub struct McpServerQuery {
     executor: BaseCodingAgent,
 }
 
-#[derive(TS, Debug, Serialize, Deserialize)]
+#[derive(TS, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct GetMcpServerResponse {
     // servers: HashMap<String, Value>,
     mcp_config: McpConfig,
     config_path: String,
 }
 
-#[derive(TS, Debug, Serialize, Deserialize)]
+#[derive(TS, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct UpdateMcpServersBody {
     servers: HashMap<String, Value>,
 }
@@ -416,7 +424,7 @@ fn set_mcp_servers_in_config_path(
     Ok(())
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProfilesContent {
     pub content: String,
     pub path: String,
@@ -475,12 +483,12 @@ async fn update_profiles(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CheckEditorAvailabilityQuery {
     editor_type: EditorType,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CheckEditorAvailabilityResponse {
     available: bool,
 }
@@ -504,7 +512,7 @@ async fn check_editor_availability(
     }))
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CheckAgentAvailabilityQuery {
     executor: BaseCodingAgent,
 }
@@ -524,7 +532,7 @@ async fn check_agent_availability(
     ResponseJson(ApiResponse::success(info))
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct AgentPresetOptionsQuery {
     pub executor: BaseCodingAgent,
     pub variant: Option<String>,
@@ -551,7 +559,7 @@ async fn get_agent_preset_options(
     ResponseJson(ApiResponse::success(options))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ExecutorDiscoveredOptionsStreamQuery {
     executor: BaseCodingAgent,
     #[serde(default)]

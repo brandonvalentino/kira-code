@@ -1,5 +1,6 @@
 use anyhow::Error;
 use executors::{executors::BaseCodingAgent, profile::ExecutorProfileId};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
 use ts_rs::TS;
@@ -11,13 +12,13 @@ fn default_git_branch_prefix() -> String {
     "vk".to_string()
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, TS, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, TS, Default, JsonSchema)]
 pub struct ShowcaseState {
     #[serde(default)]
     pub seen_features: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS, EnumString)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, EnumString, JsonSchema)]
 #[ts(use_ts_enum)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]

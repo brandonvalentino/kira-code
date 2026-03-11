@@ -1,4 +1,4 @@
-use axum::Router;
+use aide::axum::ApiRouter;
 
 use crate::DeploymentImpl;
 
@@ -12,8 +12,8 @@ mod pull_requests;
 mod tags;
 mod workspaces;
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
         .merge(issue_assignees::router())
         .merge(issue_relationships::router())
         .merge(issue_tags::router())

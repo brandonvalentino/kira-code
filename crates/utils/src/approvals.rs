@@ -1,4 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use uuid::Uuid;
@@ -41,14 +42,14 @@ pub enum ApprovalStatus {
 }
 
 /// A question–answer pair. `answer` holds one or more selected labels/values.
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct QuestionAnswer {
     pub question: String,
     pub answer: Vec<String>,
 }
 
 /// Status of a question answer request.
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum QuestionStatus {
     Answered { answers: Vec<QuestionAnswer> },
@@ -56,7 +57,7 @@ pub enum QuestionStatus {
 }
 
 // Tracks both approval and question answers requests
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum ApprovalOutcome {
     Approved,
@@ -70,7 +71,7 @@ pub enum ApprovalOutcome {
     TimedOut,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ApprovalResponse {
     pub execution_process_id: Uuid,
     pub status: ApprovalOutcome,

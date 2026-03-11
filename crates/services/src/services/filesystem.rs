@@ -7,6 +7,7 @@ use std::{
 
 #[cfg(not(feature = "qa-mode"))]
 use ignore::WalkBuilder;
+use schemars::JsonSchema;
 use serde::Serialize;
 use thiserror::Error;
 #[cfg(not(feature = "qa-mode"))]
@@ -25,13 +26,13 @@ pub enum FilesystemError {
     #[error("Failed to read directory: {0}")]
     Io(#[from] std::io::Error),
 }
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct DirectoryListResponse {
     pub entries: Vec<DirectoryEntry>,
     pub current_path: String,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct DirectoryEntry {
     pub name: String,
     pub path: PathBuf,

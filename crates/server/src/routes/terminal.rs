@@ -1,14 +1,15 @@
 use std::path::PathBuf;
 
+use aide::axum::{ApiRouter, routing::get};
 use axum::{
-    Router,
     extract::{Query, State, ws::Message},
     response::IntoResponse,
-    routing::get,
+    routing::get as axum_get,
 };
 use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
 use db::models::{workspace::Workspace, workspace_repo::WorkspaceRepo};
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -18,7 +19,7 @@ use crate::{
     routes::relay_ws::{SignedWebSocket, SignedWsUpgrade},
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct TerminalQuery {
     pub workspace_id: Uuid,
     #[serde(default = "default_cols")]
@@ -35,14 +36,14 @@ fn default_rows() -> u16 {
     24
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 enum TerminalCommand {
     Input { data: String },
     Resize { cols: u16, rows: u16 },
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 enum TerminalMessage {
     Output { data: String },
@@ -175,6 +176,6 @@ async fn send_error(socket: &mut SignedWebSocket, message: &str) -> anyhow::Resu
     Ok(())
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new().route("/terminal/ws", get(terminal_ws))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new().route("/terminal/ws", axum_get(terminal_ws))
 }

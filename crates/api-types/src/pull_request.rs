@@ -14,7 +14,7 @@ pub enum PullRequestStatus {
     Closed,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct PullRequest {
     pub id: Uuid,
     pub url: String,
@@ -29,12 +29,12 @@ pub struct PullRequest {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
 pub struct ListPullRequestsQuery {
     pub issue_id: Uuid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ListPullRequestsResponse {
     pub pull_requests: Vec<PullRequest>,
 }

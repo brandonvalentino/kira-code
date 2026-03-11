@@ -1,16 +1,21 @@
 use std::path::Path;
 
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use axum::{
-    Extension, Router,
+    Extension,
     body::Body,
     extract::{DefaultBodyLimit, Multipart, Query, Request, State},
     http::{StatusCode, header},
     middleware::{Next, from_fn_with_state},
     response::{Json as ResponseJson, Response},
-    routing::{get, post},
+    routing::post as axum_post,
 };
 use db::models::{image::Image, session::Session, workspace::Workspace};
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::{
     container::ContainerService,
@@ -30,29 +35,29 @@ use crate::{
     routes::images::{ImageMetadata, ImageResponse, process_image_upload},
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ImageMetadataQuery {
     /// Path relative to worktree root, e.g., ".vibe-images/screenshot.png"
     pub path: String,
     pub session_id: Uuid,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct SessionScopedQuery {
     pub session_id: Uuid,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct AssociateWorkspaceImagesRequest {
     pub image_ids: Vec<Uuid>,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct ImportIssueAttachmentsRequest {
     pub issue_id: Uuid,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct ImportIssueAttachmentsResponse {
     pub image_ids: Vec<Uuid>,
 }
@@ -374,27 +379,40 @@ pub(crate) async fn import_issue_attachment_images(
     Ok(imported_image_ids)
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    let metadata_router = Router::new()
-        .route("/", get(get_workspace_images))
-        .route("/associate", post(associate_workspace_images))
-        .route("/import-issue-attachments", post(import_issue_attachments))
-        .route("/metadata", get(get_image_metadata))
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    let metadata_router = ApiRouter::new()
+        .api_route("/", get(get_workspace_images))
+        .api_route("/associate", post(associate_workspace_images))
+        .api_route("/import-issue-attachments", post(import_issue_attachments))
+        .api_route("/metadata", get(get_image_metadata))
         .route(
             "/upload",
-            post(upload_image).layer(DefaultBodyLimit::max(20 * 1024 * 1024)), // 20MB limit
+            axum_post(upload_image).layer(DefaultBodyLimit::max(20 * 1024 * 1024)), // 20MB limit
         )
         .layer(from_fn_with_state(
             deployment.clone(),
             load_workspace_middleware,
         ));
 
-    let file_router = Router::new()
-        .route("/file/{*path}", get(serve_image))
+    let file_router = ApiRouter::new()
+        .api_route("/file/{*path}", get(serve_image))
         .layer(from_fn_with_state(
             deployment.clone(),
             load_workspace_with_wildcard,
         ));
 
     metadata_router.merge(file_router)
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    let upload_route: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum::routing::post(upload_image).into();
+
+    ApiRouter::new()
+        .api_route("/", get(get_workspace_images))
+        .api_route("/associate", post(associate_workspace_images))
+        .api_route("/import-issue-attachments", post(import_issue_attachments))
+        .api_route("/metadata", get(get_image_metadata))
+        .route("/upload", upload_route)
+        .api_route("/file/{*path}", get(serve_image))
 }

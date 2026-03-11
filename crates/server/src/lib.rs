@@ -1,5 +1,6 @@
 pub mod error;
 pub mod middleware;
+pub mod openapi;
 pub mod preview_proxy;
 pub mod routes;
 pub mod tunnel;

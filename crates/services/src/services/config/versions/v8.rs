@@ -1,5 +1,6 @@
 use anyhow::Error;
 use executors::{executors::BaseCodingAgent, profile::ExecutorProfileId};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 pub use v7::{
@@ -25,14 +26,14 @@ fn default_relay_enabled() -> bool {
     true
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, TS, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, TS, JsonSchema, PartialEq, Eq)]
 pub enum SendMessageShortcut {
     #[default]
     ModifierEnter,
     Enter,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, TS)]
+#[derive(Clone, Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct Config {
     pub config_version: String,
     pub theme: ThemeMode,

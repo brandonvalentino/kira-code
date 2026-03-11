@@ -26,7 +26,7 @@ pub struct CreateWorkspaceRepo {
     pub target_branch: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, schemars::JsonSchema)]
 pub struct RepoWithTargetBranch {
     #[serde(flatten)]
     pub repo: Repo,

@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use thiserror::Error;
@@ -19,7 +20,7 @@ pub enum SessionError {
     ExecutorMismatch { expected: String, actual: String },
 }
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS, JsonSchema)]
 pub struct Session {
     pub id: Uuid,
     pub workspace_id: Uuid,
@@ -29,7 +30,7 @@ pub struct Session {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct CreateSession {
     pub executor: Option<String>,
 }

@@ -1,12 +1,14 @@
+use aide::axum::{ApiRouter, routing::get};
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, State, ws::Message},
     response::{IntoResponse, Json as ResponseJson},
-    routing::get,
+    routing::{delete as axum_delete, get as axum_get, post as axum_post, put as axum_put},
 };
 use db::models::scratch::{CreateScratch, Scratch, ScratchType, UpdateScratch};
 use deployment::Deployment;
 use futures_util::{StreamExt, TryStreamExt};
+use schemars::JsonSchema;
 use serde::Deserialize;
 use utils::response::ApiResponse;
 use uuid::Uuid;
@@ -18,7 +20,7 @@ use crate::{
 };
 
 /// Path parameters for scratch routes with composite key
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 pub struct ScratchPath {
     scratch_type: ScratchType,
     id: Uuid,
@@ -154,18 +156,35 @@ async fn handle_scratch_ws(
     Ok(())
 }
 
-pub fn router(_deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/scratch", get(list_scratch))
-        .route(
-            "/scratch/{scratch_type}/{id}",
-            get(get_scratch)
-                .post(create_scratch)
-                .put(update_scratch)
-                .delete(delete_scratch),
-        )
+pub fn router(_deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .route("/scratch", axum_get(list_scratch))
+        .route("/scratch/{scratch_type}/{id}", axum_get(get_scratch))
+        .route("/scratch/{scratch_type}/{id}", axum_post(create_scratch))
+        .route("/scratch/{scratch_type}/{id}", axum_put(update_scratch))
+        .route("/scratch/{scratch_type}/{id}", axum_delete(delete_scratch))
         .route(
             "/scratch/{scratch_type}/{id}/stream/ws",
-            get(stream_scratch_ws),
+            axum_get(stream_scratch_ws),
         )
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    use axum::routing::{
+        delete as axum_delete, get as axum_get, post as axum_post, put as axum_put,
+    };
+    let list: aide::axum::routing::ApiMethodRouter<DeploymentImpl> = axum_get(list_scratch).into();
+    let get_s: aide::axum::routing::ApiMethodRouter<DeploymentImpl> = axum_get(get_scratch).into();
+    let create: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum_post(create_scratch).into();
+    let update: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum_put(update_scratch).into();
+    let delete: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum_delete(delete_scratch).into();
+    ApiRouter::new()
+        .route("/scratch", list)
+        .route("/scratch/{scratch_type}/{id}", get_s)
+        .route("/scratch/{scratch_type}/{id}", create)
+        .route("/scratch/{scratch_type}/{id}", update)
+        .route("/scratch/{scratch_type}/{id}", delete)
 }

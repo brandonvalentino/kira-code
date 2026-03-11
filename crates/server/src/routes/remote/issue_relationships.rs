@@ -1,27 +1,26 @@
+use aide::axum::{ApiRouter, routing::get};
 use api_types::{
     CreateIssueRelationshipRequest, IssueRelationship, ListIssueRelationshipsQuery,
     ListIssueRelationshipsResponse, MutationResponse,
 };
 use axum::{
-    Router,
     extract::{Json, Path, Query, State},
     response::Json as ResponseJson,
-    routing::get,
 };
 use utils::response::ApiResponse;
 use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
         .route(
             "/issue-relationships",
             get(list_issue_relationships).post(create_issue_relationship),
         )
         .route(
             "/issue-relationships/{relationship_id}",
-            axum::routing::delete(delete_issue_relationship),
+            aide::axum::routing::delete(delete_issue_relationship),
         )
 }
 

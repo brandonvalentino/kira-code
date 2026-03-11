@@ -1,14 +1,18 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{delete, get, post},
+};
 use axum::{
-    Router,
     body::Body,
     extract::{DefaultBodyLimit, Multipart, Path, State},
     http::{StatusCode, header},
     response::{Json as ResponseJson, Response},
-    routing::{delete, get, post},
+    routing::post as axum_post,
 };
 use chrono::{DateTime, Utc};
 use db::models::image::{Image, WorkspaceImage};
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::image::ImageError;
 use tokio::fs::File;
@@ -19,7 +23,7 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ImageResponse {
     pub id: Uuid,
     pub file_path: String, // relative path to display in markdown
@@ -49,7 +53,7 @@ impl ImageResponse {
 }
 
 /// Metadata response for image files, used for rendering in WYSIWYG editor
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ImageMetadata {
     pub exists: bool,
     pub file_name: Option<String>,
@@ -155,12 +159,12 @@ pub async fn delete_image(
     Ok(ResponseJson(ApiResponse::success(())))
 }
 
-pub fn routes() -> Router<DeploymentImpl> {
-    Router::new()
+pub fn routes() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
         .route(
             "/upload",
-            post(upload_image).layer(DefaultBodyLimit::max(20 * 1024 * 1024)), // 20MB limit
+            axum_post(upload_image).layer(DefaultBodyLimit::max(20 * 1024 * 1024)), // 20MB limit
         )
-        .route("/{id}/file", get(serve_image))
-        .route("/{id}", delete(delete_image))
+        .api_route("/{id}/file", get(serve_image))
+        .api_route("/{id}", delete(delete_image))
 }

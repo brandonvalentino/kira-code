@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use executors::actions::{ExecutorAction, ExecutorActionType};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use thiserror::Error;
@@ -38,7 +39,7 @@ struct WorkspaceContainerRefRow {
     container_ref: String,
 }
 
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, TS, JsonSchema)]
 pub struct Workspace {
     pub id: Uuid,
     pub task_id: Option<Uuid>,
@@ -75,13 +76,13 @@ pub struct CreateFollowUpAttempt {
 }
 
 /// Context data for resume operations (simplified)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct AttemptResumeContext {
     pub execution_history: String,
     pub cumulative_diffs: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct WorkspaceContext {
     pub workspace: Workspace,
     pub workspace_repos: Vec<RepoWithTargetBranch>,

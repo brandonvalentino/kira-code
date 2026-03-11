@@ -1,14 +1,17 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use api_types::{HandoffInitRequest, HandoffRedeemRequest, StatusResponse};
 use axum::{
-    Router,
     extract::{Json, Query, State},
     http::{Response, StatusCode},
     response::Json as ResponseJson,
-    routing::{get, post},
 };
 use chrono::{DateTime, Utc};
 use deployment::Deployment;
 use rand::{Rng, distributions::Alphanumeric};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::{
     config::save_config_to_file, oauth_credentials::Credentials, remote_sync,
@@ -21,35 +24,35 @@ use uuid::Uuid;
 use crate::{DeploymentImpl, error::ApiError, tunnel};
 
 /// Response from GET /api/auth/token - returns the current access token
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct TokenResponse {
     pub access_token: String,
     pub expires_at: Option<DateTime<Utc>>,
 }
 
 /// Response from GET /api/auth/user - returns the current user ID
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct CurrentUserResponse {
     pub user_id: String,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/auth/handoff/init", post(handoff_init))
-        .route("/auth/handoff/complete", get(handoff_complete))
-        .route("/auth/logout", post(logout))
-        .route("/auth/status", get(status))
-        .route("/auth/token", get(get_token))
-        .route("/auth/user", get(get_current_user))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/auth/handoff/init", post(handoff_init))
+        .api_route("/auth/handoff/complete", get(handoff_complete))
+        .api_route("/auth/logout", post(logout))
+        .api_route("/auth/status", get(status))
+        .api_route("/auth/token", get(get_token))
+        .api_route("/auth/user", get(get_current_user))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 struct HandoffInitPayload {
     provider: String,
     return_to: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 struct HandoffInitResponseBody {
     handoff_id: Uuid,
     authorize_url: String,
@@ -84,7 +87,7 @@ async fn handoff_init(
     )))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 struct HandoffCompleteQuery {
     handoff_id: Uuid,
     #[serde(default)]

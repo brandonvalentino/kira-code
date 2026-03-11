@@ -13,6 +13,7 @@ use executors::{
     },
     executors::ExecutorError,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::container::ContainerService;
 use ts_rs::TS;
@@ -20,7 +21,7 @@ use uuid::Uuid;
 
 use crate::error::ApiError;
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[ts(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum GhCliSetupError {
     BrewMissing,

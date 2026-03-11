@@ -1,11 +1,14 @@
 use std::path::PathBuf;
 
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use api_types::{PullRequestStatus, UpsertPullRequestRequest};
 use axum::{
-    Extension, Json, Router,
+    Extension, Json,
     extract::{Query, State},
     response::Json as ResponseJson,
-    routing::{get, post},
 };
 use db::models::{
     coding_agent_turn::CodingAgentTurn,
@@ -26,6 +29,7 @@ use git_host::{
     CreatePrRequest, GitHostError, GitHostProvider, GitHostService, ProviderKind, UnifiedPrComment,
     github::GhCli,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::{
     config::DEFAULT_PR_DESCRIPTION_PROMPT, container::ContainerService, remote_sync,
@@ -37,7 +41,7 @@ use workspace_manager::WorkspaceManager;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct CreatePrApiRequest {
     pub title: String,
     pub body: Option<String>,
@@ -48,7 +52,7 @@ pub struct CreatePrApiRequest {
     pub auto_generate_description: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum PrError {
@@ -60,7 +64,7 @@ pub enum PrError {
     UnsupportedProvider,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct AttachPrResponse {
     pub pr_attached: bool,
     pub pr_url: Option<String>,
@@ -68,17 +72,17 @@ pub struct AttachPrResponse {
     pub pr_status: Option<MergeStatus>,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct AttachExistingPrRequest {
     pub repo_id: Uuid,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct PrCommentsResponse {
     pub comments: Vec<UnifiedPrComment>,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum GetPrCommentsError {
@@ -87,7 +91,7 @@ pub enum GetPrCommentsError {
     CliNotLoggedIn { provider: ProviderKind },
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Debug, Deserialize, TS, JsonSchema)]
 pub struct GetPrCommentsQuery {
     pub repo_id: Uuid,
 }
@@ -604,7 +608,7 @@ pub async fn get_pr_comments(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CreateWorkspaceFromPrBody {
     pub repo_id: Uuid,
     pub pr_number: i64,
@@ -616,12 +620,12 @@ pub struct CreateWorkspaceFromPrBody {
     pub remote_name: Option<String>,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct CreateWorkspaceFromPrResponse {
     pub workspace: Workspace,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum CreateFromPrError {
@@ -830,9 +834,9 @@ pub async fn create_workspace_from_pr(
     )))
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/", post(create_pr))
-        .route("/attach", post(attach_existing_pr))
-        .route("/comments", get(get_pr_comments))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/", post(create_pr))
+        .api_route("/attach", post(attach_existing_pr))
+        .api_route("/comments", get(get_pr_comments))
 }

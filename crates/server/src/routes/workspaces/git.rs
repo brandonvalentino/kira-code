@@ -3,11 +3,14 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post, put},
+};
 use axum::{
-    Extension, Json, Router,
+    Extension, Json,
     extract::State,
     response::{IntoResponse, Json as ResponseJson},
-    routing::{get, post},
 };
 use db::models::{
     merge::{Merge, MergeStatus, PrMerge, PullRequestInfo},
@@ -18,6 +21,7 @@ use db::models::{
 use deployment::Deployment;
 use git::{ConflictOp, GitCliError, GitServiceError};
 use git2::BranchType;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::{container::ContainerService, diff_stream, remote_sync};
 use ts_rs::TS;
@@ -27,24 +31,24 @@ use uuid::Uuid;
 use super::streams::{DiffStreamQuery, stream_workspace_diff_ws};
 use crate::{DeploymentImpl, error::ApiError, routes::relay_ws::SignedWsUpgrade};
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct RebaseWorkspaceRequest {
     pub repo_id: Uuid,
     pub old_base_branch: Option<String>,
     pub new_base_branch: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct AbortConflictsRequest {
     pub repo_id: Uuid,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct ContinueRebaseRequest {
     pub repo_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum GitOperationError {
@@ -57,24 +61,24 @@ pub enum GitOperationError {
     RebaseInProgress,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct MergeWorkspaceRequest {
     pub repo_id: Uuid,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct PushWorkspaceRequest {
     pub repo_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum PushError {
     ForcePushRequired,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct BranchStatus {
     pub commits_behind: Option<usize>,
     pub commits_ahead: Option<usize>,
@@ -92,7 +96,7 @@ pub struct BranchStatus {
     pub is_target_remote: bool,
 }
 
-#[derive(Debug, Clone, Serialize, TS)]
+#[derive(Debug, Clone, Serialize, TS, JsonSchema)]
 pub struct RepoBranchStatus {
     pub repo_id: Uuid,
     pub repo_name: String,
@@ -100,30 +104,30 @@ pub struct RepoBranchStatus {
     pub status: BranchStatus,
 }
 
-#[derive(Deserialize, Debug, TS)]
+#[derive(Deserialize, Debug, TS, JsonSchema)]
 pub struct ChangeTargetBranchRequest {
     pub repo_id: Uuid,
     pub new_target_branch: String,
 }
 
-#[derive(Serialize, Debug, TS)]
+#[derive(Serialize, Debug, TS, JsonSchema)]
 pub struct ChangeTargetBranchResponse {
     pub repo_id: Uuid,
     pub new_target_branch: String,
     pub status: (usize, usize),
 }
 
-#[derive(Deserialize, Debug, TS)]
+#[derive(Deserialize, Debug, TS, JsonSchema)]
 pub struct RenameBranchRequest {
     pub new_branch_name: String,
 }
 
-#[derive(Serialize, Debug, TS)]
+#[derive(Serialize, Debug, TS, JsonSchema)]
 pub struct RenameBranchResponse {
     pub branch: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum RenameBranchError {
@@ -135,18 +139,20 @@ pub enum RenameBranchError {
     RenameFailed { repo_name: String, message: String },
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/status", get(get_workspace_branch_status))
-        .route("/diff/ws", get(stream_diff_ws))
-        .route("/merge", post(merge_workspace))
-        .route("/push", post(push_workspace_branch))
-        .route("/push/force", post(force_push_workspace_branch))
-        .route("/rebase", post(rebase_workspace))
-        .route("/rebase/continue", post(continue_workspace_rebase))
-        .route("/conflicts/abort", post(abort_workspace_conflicts))
-        .route("/target-branch", axum::routing::put(change_target_branch))
-        .route("/branch", axum::routing::put(rename_branch))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    let ws_routes: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum::routing::get(stream_diff_ws).into();
+    ApiRouter::new()
+        .api_route("/status", get(get_workspace_branch_status))
+        .route("/diff/ws", ws_routes)
+        .api_route("/merge", post(merge_workspace))
+        .api_route("/push", post(push_workspace_branch))
+        .api_route("/push/force", post(force_push_workspace_branch))
+        .api_route("/rebase", post(rebase_workspace))
+        .api_route("/rebase/continue", post(continue_workspace_rebase))
+        .api_route("/conflicts/abort", post(abort_workspace_conflicts))
+        .api_route("/target-branch", put(change_target_branch))
+        .api_route("/branch", put(rename_branch))
 }
 
 async fn resolve_kira_code_identifier(

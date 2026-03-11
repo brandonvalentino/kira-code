@@ -1,14 +1,14 @@
 use std::path::Path;
 
-use axum::{
-    Extension, Json, Router, extract::State, response::Json as ResponseJson, routing::post,
-};
+use aide::axum::{ApiRouter, routing::post};
+use axum::{Extension, Json, extract::State, response::Json as ResponseJson};
 use db::models::{workspace::Workspace, workspace_repo::WorkspaceRepo};
 use deployment::Deployment;
 use executors::{
     executors::{CodingAgent, ExecutorError},
     profile::{ExecutorConfigs, ExecutorProfileId},
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::container::ContainerService;
 use ts_rs::TS;
@@ -17,30 +17,30 @@ use utils::response::ApiResponse;
 use super::{codex_setup, cursor_setup, gh_cli_setup::GhCliSetupError};
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS, JsonSchema)]
 pub struct RunAgentSetupRequest {
     pub executor_profile_id: ExecutorProfileId,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct RunAgentSetupResponse {}
 
-#[derive(Deserialize, TS)]
+#[derive(Deserialize, TS, JsonSchema)]
 pub struct OpenEditorRequest {
     editor_type: Option<String>,
     file_path: Option<String>,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Serialize, TS, JsonSchema)]
 pub struct OpenEditorResponse {
     pub url: Option<String>,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/editor/open", post(open_workspace_in_editor))
-        .route("/agent/setup", post(run_agent_setup))
-        .route("/github/cli/setup", post(gh_cli_setup_handler))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/editor/open", post(open_workspace_in_editor))
+        .api_route("/agent/setup", post(run_agent_setup))
+        .api_route("/github/cli/setup", post(gh_cli_setup_handler))
 }
 
 #[axum::debug_handler]

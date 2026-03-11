@@ -1,4 +1,5 @@
-use axum::{Extension, Router, extract::State, response::Json as ResponseJson, routing::post};
+use aide::axum::{ApiRouter, routing::post};
+use axum::{Extension, extract::State, response::Json as ResponseJson};
 use db::models::{
     execution_process::{ExecutionProcess, ExecutionProcessRunReason, ExecutionProcessStatus},
     session::{CreateSession, Session},
@@ -10,6 +11,7 @@ use executors::actions::{
     ExecutorAction, ExecutorActionType,
     script::{ScriptContext, ScriptRequest, ScriptRequestLanguage},
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use services::services::container::ContainerService;
 use ts_rs::TS;
@@ -18,7 +20,7 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[ts(tag = "type", rename_all = "snake_case")]
 pub enum RunScriptError {
@@ -26,12 +28,12 @@ pub enum RunScriptError {
     ProcessAlreadyRunning,
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/dev-server/start", post(start_dev_server))
-        .route("/cleanup", post(run_cleanup_script))
-        .route("/archive", post(run_archive_script))
-        .route("/stop", post(stop_workspace_execution))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/dev-server/start", post(start_dev_server))
+        .api_route("/cleanup", post(run_cleanup_script))
+        .api_route("/archive", post(run_archive_script))
+        .api_route("/stop", post(stop_workspace_execution))
 }
 
 #[axum::debug_handler]

@@ -1,3 +1,7 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{delete, get, patch, post},
+};
 use api_types::{
     AcceptInvitationResponse, CreateInvitationRequest, CreateInvitationResponse,
     CreateOrganizationRequest, CreateOrganizationResponse, GetInvitationResponse,
@@ -6,11 +10,9 @@ use api_types::{
     UpdateMemberRoleResponse, UpdateOrganizationRequest,
 };
 use axum::{
-    Router,
     extract::{Json, Path, State},
     http::StatusCode,
     response::Json as ResponseJson,
-    routing::{delete, get, patch, post},
 };
 use deployment::Deployment;
 use utils::response::ApiResponse;
@@ -18,30 +20,30 @@ use uuid::Uuid;
 
 use crate::{DeploymentImpl, error::ApiError};
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/organizations", get(list_organizations))
-        .route("/organizations", post(create_organization))
-        .route("/organizations/{id}", get(get_organization))
-        .route("/organizations/{id}", patch(update_organization))
-        .route("/organizations/{id}", delete(delete_organization))
-        .route(
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/organizations", get(list_organizations))
+        .api_route("/organizations", post(create_organization))
+        .api_route("/organizations/{id}", get(get_organization))
+        .api_route("/organizations/{id}", patch(update_organization))
+        .api_route("/organizations/{id}", delete(delete_organization))
+        .api_route(
             "/organizations/{org_id}/invitations",
             post(create_invitation),
         )
-        .route("/organizations/{org_id}/invitations", get(list_invitations))
-        .route(
+        .api_route("/organizations/{org_id}/invitations", get(list_invitations))
+        .api_route(
             "/organizations/{org_id}/invitations/revoke",
             post(revoke_invitation),
         )
-        .route("/invitations/{token}", get(get_invitation))
-        .route("/invitations/{token}/accept", post(accept_invitation))
-        .route("/organizations/{org_id}/members", get(list_members))
-        .route(
+        .api_route("/invitations/{token}", get(get_invitation))
+        .api_route("/invitations/{token}/accept", post(accept_invitation))
+        .api_route("/organizations/{org_id}/members", get(list_members))
+        .api_route(
             "/organizations/{org_id}/members/{user_id}",
             delete(remove_member),
         )
-        .route(
+        .api_route(
             "/organizations/{org_id}/members/{user_id}/role",
             patch(update_member_role),
         )

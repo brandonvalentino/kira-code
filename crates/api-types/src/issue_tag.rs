@@ -1,17 +1,18 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use uuid::Uuid;
 
 use crate::some_if_present;
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct IssueTag {
     pub id: Uuid,
     pub issue_id: Uuid,
     pub tag_id: Uuid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct CreateIssueTagRequest {
     /// Optional client-generated ID. If not provided, server generates one.
     /// Using client-generated IDs enables stable optimistic updates.
@@ -21,7 +22,7 @@ pub struct CreateIssueTagRequest {
     pub tag_id: Uuid,
 }
 
-#[derive(Debug, Clone, Deserialize, TS)]
+#[derive(Debug, Clone, Deserialize, TS, JsonSchema)]
 pub struct UpdateIssueTagRequest {
     #[serde(default, deserialize_with = "some_if_present")]
     pub tag_id: Option<Uuid>,
@@ -32,7 +33,7 @@ pub struct ListIssueTagsQuery {
     pub issue_id: Uuid,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, JsonSchema)]
 pub struct ListIssueTagsResponse {
     pub issue_tags: Vec<IssueTag>,
 }

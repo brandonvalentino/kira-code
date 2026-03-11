@@ -44,7 +44,7 @@ pub mod qa_mock;
 pub mod qwen;
 pub mod utils;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, TS, JsonSchema)]
 pub struct SlashCommandDescription {
     /// Command name without the leading slash, e.g. `help` for `/help`.
     pub name: String,
@@ -52,7 +52,7 @@ pub struct SlashCommandDescription {
     pub description: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, TS, JsonSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(use_ts_enum)]
 pub enum BaseAgentCapability {
@@ -93,14 +93,23 @@ pub enum ExecutorError {
 
 #[enum_dispatch]
 #[derive(
-    Debug, Clone, Serialize, Deserialize, PartialEq, TS, Display, EnumDiscriminants, VariantNames,
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    TS,
+    Display,
+    EnumDiscriminants,
+    VariantNames,
+    JsonSchema,
 )]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 #[strum_discriminants(
     name(BaseCodingAgent),
     // Only add Hash; Eq/PartialEq are already provided by EnumDiscriminants.
-    derive(EnumString, Hash, strum_macros::Display, Serialize, Deserialize, TS, Type),
+    derive(EnumString, Hash, strum_macros::Display, Serialize, Deserialize, TS, Type, JsonSchema),
     strum(serialize_all = "SCREAMING_SNAKE_CASE"),
     ts(use_ts_enum),
     serde(rename_all = "SCREAMING_SNAKE_CASE"),

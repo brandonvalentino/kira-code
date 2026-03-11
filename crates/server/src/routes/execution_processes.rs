@@ -1,10 +1,14 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use anyhow;
 use axum::{
-    Extension, Router,
+    Extension,
     extract::{Path, Query, State, ws::Message},
     middleware::from_fn_with_state,
     response::{IntoResponse, Json as ResponseJson},
-    routing::{get, post},
+    routing::get as axum_get,
 };
 use db::models::{
     execution_process::{ExecutionProcess, ExecutionProcessError, ExecutionProcessStatus},
@@ -12,6 +16,7 @@ use db::models::{
 };
 use deployment::Deployment;
 use futures_util::{StreamExt, TryStreamExt};
+use schemars::JsonSchema;
 use serde::Deserialize;
 use services::services::container::ContainerService;
 use utils::{log_msg::LogMsg, response::ApiResponse};
@@ -24,7 +29,7 @@ use crate::{
     routes::relay_ws::{SignedWebSocket, SignedWsUpgrade},
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct SessionExecutionProcessQuery {
     pub session_id: Uuid,
     /// If true, include soft-deleted (dropped) processes in results/stream
@@ -268,24 +273,48 @@ pub async fn get_execution_process_repo_states(
     Ok(ResponseJson(ApiResponse::success(repo_states)))
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    let workspace_id_router = Router::new()
-        .route("/", get(get_execution_process_by_id))
-        .route("/stop", post(stop_execution_process))
-        .route("/repo-states", get(get_execution_process_repo_states))
-        .route("/raw-logs/ws", get(stream_raw_logs_ws))
-        .route("/normalized-logs/ws", get(stream_normalized_logs_ws))
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    let workspace_id_router = ApiRouter::new()
+        .api_route("/", get(get_execution_process_by_id))
+        .api_route("/stop", post(stop_execution_process))
+        .route("/repo-states", axum_get(get_execution_process_repo_states))
+        .route("/raw-logs/ws", axum_get(stream_raw_logs_ws))
+        .route("/normalized-logs/ws", axum_get(stream_normalized_logs_ws))
         .layer(from_fn_with_state(
             deployment.clone(),
             load_execution_process_middleware,
         ));
 
-    let workspaces_router = Router::new()
+    let workspaces_router = ApiRouter::new()
         .route(
             "/stream/session/ws",
-            get(stream_execution_processes_by_session_ws),
+            axum_get(stream_execution_processes_by_session_ws),
         )
         .nest("/{id}", workspace_id_router);
 
-    Router::new().nest("/execution-processes", workspaces_router)
+    ApiRouter::new().nest("/execution-processes", workspaces_router)
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    let ws_routes: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum::routing::get(stream_raw_logs_ws).into();
+    let norm_routes: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum::routing::get(stream_normalized_logs_ws).into();
+    let repo_routes: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum::routing::get(get_execution_process_repo_states).into();
+    let session_ws: aide::axum::routing::ApiMethodRouter<DeploymentImpl> =
+        axum::routing::get(stream_execution_processes_by_session_ws).into();
+
+    let workspace_id_router = ApiRouter::new()
+        .api_route("/", get(get_execution_process_by_id))
+        .api_route("/stop", post(stop_execution_process))
+        .route("/repo-states", repo_routes)
+        .route("/raw-logs/ws", ws_routes)
+        .route("/normalized-logs/ws", norm_routes);
+
+    let workspaces_router = ApiRouter::new()
+        .route("/stream/session/ws", session_ws)
+        .nest("/{id}", workspace_id_router);
+
+    ApiRouter::new().nest("/execution-processes", workspaces_router)
 }

@@ -1,9 +1,12 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{get, post},
+};
 use axum::{
-    Router,
     extract::{State, ws::Message},
     http::StatusCode,
     response::{IntoResponse, Json as ResponseJson},
-    routing::{get, post},
+    routing::get as axum_get,
 };
 use deployment::Deployment;
 use futures_util::StreamExt;
@@ -106,8 +109,8 @@ async fn handle_approvals_ws(
     Ok(())
 }
 
-pub fn router() -> Router<DeploymentImpl> {
-    Router::new()
-        .route("/approvals/{id}/respond", post(respond_to_approval))
-        .route("/approvals/stream/ws", get(stream_approvals_ws))
+pub fn router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/approvals/{id}/respond", post(respond_to_approval))
+        .route("/approvals/stream/ws", axum_get(stream_approvals_ws))
 }

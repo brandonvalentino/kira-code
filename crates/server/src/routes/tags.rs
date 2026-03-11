@@ -1,19 +1,23 @@
+use aide::axum::{
+    ApiRouter,
+    routing::{get, put},
+};
 use axum::{
-    Extension, Json, Router,
+    Extension, Json,
     extract::{Query, State},
     middleware::from_fn_with_state,
     response::Json as ResponseJson,
-    routing::{get, put},
 };
 use db::models::tag::{CreateTag, Tag, UpdateTag};
 use deployment::Deployment;
+use schemars::JsonSchema;
 use serde::Deserialize;
 use ts_rs::TS;
 use utils::response::ApiResponse;
 
 use crate::{DeploymentImpl, error::ApiError, middleware::load_tag_middleware};
 
-#[derive(Deserialize, TS)]
+#[derive(Deserialize, TS, JsonSchema)]
 pub struct TagSearchParams {
     #[serde(default)]
     pub search: Option<String>,
@@ -85,14 +89,32 @@ pub async fn delete_tag(
     }
 }
 
-pub fn router(deployment: &DeploymentImpl) -> Router<DeploymentImpl> {
-    let tag_router = Router::new()
-        .route("/", put(update_tag).delete(delete_tag))
+/// Returns an ApiRouter for OpenAPI spec generation.
+/// finish_api() traverses route tree without needing actual state.
+pub fn tags_api_router() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/", get(get_tags).post(create_tag))
+        .api_route("/{tag_id}", put(update_tag).delete(delete_tag))
+}
+
+pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
+    let tag_router = ApiRouter::new()
+        .api_route("/", put(update_tag).delete(delete_tag))
         .layer(from_fn_with_state(deployment.clone(), load_tag_middleware));
 
-    let inner = Router::new()
-        .route("/", get(get_tags).post(create_tag))
+    let inner = ApiRouter::new()
+        .api_route("/", get(get_tags).post(create_tag))
         .nest("/{tag_id}", tag_router);
 
-    Router::new().nest("/tags", inner)
+    ApiRouter::new().nest("/tags", inner)
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    let tag_router = ApiRouter::new().api_route("/", put(update_tag).delete(delete_tag));
+
+    let inner = ApiRouter::new()
+        .api_route("/", get(get_tags).post(create_tag))
+        .nest("/{tag_id}", tag_router);
+
+    ApiRouter::new().nest("/tags", inner)
 }

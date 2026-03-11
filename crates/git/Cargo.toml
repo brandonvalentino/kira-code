@@ -11,6 +11,7 @@ cloud = []
 chrono = { version = "0.4", features = ["serde"] }
 dirs = "5.0"
 git2 = { workspace = true }
+schemars = { workspace = true }
 serde = { workspace = true }
 tempfile = "3.21"
 thiserror = { workspace = true }
