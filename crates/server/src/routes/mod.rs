@@ -103,7 +103,7 @@ pub fn router(deployment: DeploymentImpl) -> IntoMakeService<Router> {
         .with_state(deployment.clone());
 
     let api_routes = Router::new()
-        .merge(relay_auth::router())
+        .merge(relay_auth::router_for_spec())
         .merge(relay_signed_routes)
         // Serve OpenAPI spec JSON
         .route(
@@ -141,25 +141,25 @@ pub fn router(deployment: DeploymentImpl) -> IntoMakeService<Router> {
 /// aide only reads the route tree structure — middleware is not needed for spec generation.
 pub fn api_router_for_spec() -> ApiRouter<DeploymentImpl> {
     ApiRouter::new()
-        .merge(health::router())
-        .merge(config::router())
+        .merge(health::router_for_spec())
+        .merge(config::router_for_spec())
         .merge(containers::router_for_spec())
         .merge(workspaces::router_for_spec())
         .merge(execution_processes::router_for_spec())
         .merge(tags::router_for_spec())
-        .merge(oauth::router())
-        .merge(organizations::router())
-        .merge(filesystem::router())
-        .merge(repo::router())
+        .merge(oauth::router_for_spec())
+        .merge(organizations::router_for_spec())
+        .merge(filesystem::router_for_spec())
+        .merge(repo::router_for_spec())
         .merge(events::router_for_spec())
-        .merge(approvals::router())
+        .merge(approvals::router_for_spec())
         .merge(scratch::router_for_spec())
         .merge(search::router_for_spec())
-        .merge(releases::router())
-        .merge(migration::router())
+        .merge(releases::router_for_spec())
+        .merge(migration::router_for_spec())
         .merge(sessions::router_for_spec())
-        .merge(terminal::router())
-        .merge(relay_auth::router())
+        .merge(terminal::router_for_spec())
+        .merge(relay_auth::router_for_spec())
         .nest("/remote", remote::router())
         .nest("/images", images::routes())
 }

@@ -87,3 +87,16 @@
 - [ ] 8.5 Run `cargo test --workspace` — all tests pass
 - [ ] 8.6 Manual end-to-end smoke test: `npx kira-code` → connects to cloud → receive `start_agent` → agent runs → events appear in UI → steer message reaches agent
 - [ ] 8.7 Update `README.md` — remove local install instructions, add cloud onboarding flow, document `npx kira-code` as the local agent runner
+
+## 9. Keycloak Auth Replacement
+
+- [ ] 9.1 Add `openidconnect = { version = "4", features = ["reqwest"] }` to `crates/remote/Cargo.toml`
+- [ ] 9.2 Delete `GitHubOAuthProvider` and `GoogleOAuthProvider` from `crates/remote/src/auth/provider.rs`
+- [ ] 9.3 Implement `KeycloakOAuthProvider` in `provider.rs` using `openidconnect` crate — use `CoreProviderMetadata::discover_async()` on startup to fetch the Keycloak realm's OIDC discovery document; implement `authorize_url`, `exchange_code` (with ID token verification via `id_token.claims()`), `fetch_user` (from ID token claims — no extra HTTP call needed), and `validate_token` (check expiry + refresh via `openidconnect`)
+- [ ] 9.4 Update `AuthConfig` in `crates/remote/src/config.rs` — remove `github` and `google` fields; add `keycloak: KeycloakConfig` struct with `issuer_url`, `client_id`, `client_secret`; replace `ConfigError::NoOAuthProviders` with `ConfigError::NoKeycloakConfig`
+- [ ] 9.5 Update env vars: replace `GITHUB_OAUTH_CLIENT_ID/SECRET` and `GOOGLE_OAUTH_CLIENT_ID/SECRET` with `KEYCLOAK_ISSUER_URL`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET`
+- [ ] 9.6 Update `crates/remote/src/app.rs` — remove GitHub/Google provider registration; register `KeycloakOAuthProvider` (performs discovery at startup, fails fast if Keycloak is unreachable)
+- [ ] 9.7 Update `handoff.rs` `ensure_email` fallback — replace `github`/`google` cases with a generic `keycloak` fallback
+- [ ] 9.8 Remove GitHub/Google login buttons from `packages/remote-web/src/`; replace with a single "Sign in with Keycloak" button
+- [ ] 9.9 Update `docker-compose` and `.env.example` — remove old OAuth vars, add Keycloak vars with a local Keycloak service for development
+- [ ] 9.10 Write integration tests: Keycloak OIDC discovery succeeds; `exchange_code` correctly verifies ID token claims; `validate_token` refreshes on expiry; missing Keycloak config fails fast at startup

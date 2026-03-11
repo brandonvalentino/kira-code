@@ -313,7 +313,9 @@ pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
         .nest("/{session_id}", session_id_router)
         .nest("/{session_id}/queue", queue::router(deployment));
 
-    ApiRouter::new().nest("/sessions", sessions_router)
+    ApiRouter::new()
+        .nest("/sessions", sessions_router)
+        .with_path_items(|p| p.tag("sessions"))
 }
 
 pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
@@ -329,5 +331,7 @@ pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
         .api_route("/", get(get_sessions).post(create_session))
         .nest("/{session_id}", session_id_router);
 
-    ApiRouter::new().nest("/sessions", sessions_router)
+    ApiRouter::new()
+        .nest("/sessions", sessions_router)
+        .with_path_items(|p| p.tag("sessions"))
 }

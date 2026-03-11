@@ -64,6 +64,7 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
             "/agents/discovered-options/ws",
             axum_get(stream_executor_discovered_options_ws),
         )
+        .with_path_items(|p| p.tag("config"))
 }
 
 #[derive(Debug, Serialize, Deserialize, TS, JsonSchema)]
@@ -645,4 +646,19 @@ async fn handle_executor_discovered_options_ws(
         .send(LogMsg::Finished.to_ws_message_unchecked())
         .await;
     Ok(())
+}
+
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    ApiRouter::new()
+        .api_route("/info", get(get_user_system_info))
+        .api_route("/config", put(update_config))
+        .api_route("/sounds/{sound}", get(get_sound))
+        .api_route("/mcp-config", get(get_mcp_servers).post(update_mcp_servers))
+        .api_route("/profiles", get(get_profiles).put(update_profiles))
+        .api_route(
+            "/editors/check-availability",
+            get(check_editor_availability),
+        )
+        .api_route("/agents/preset-options", get(get_agent_preset_options))
+        .with_path_items(|p| p.tag("config"))
 }

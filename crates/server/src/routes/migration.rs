@@ -18,6 +18,7 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
     ApiRouter::new()
         .api_route("/migration/start", post(start_migration))
         .route("/migration/projects", axum_get(list_projects))
+        .with_path_items(|p| p.tag("migration"))
 }
 
 async fn start_migration(
@@ -45,4 +46,7 @@ async fn list_projects(
     let projects = Project::find_all(pool).await?;
 
     Ok(ResponseJson(ApiResponse::success(projects)))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

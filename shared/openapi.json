@@ -5,8 +5,11 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/api/health": {
+    "/health": {
       "get": {
+        "tags": [
+          "health"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -21,8 +24,11 @@
         }
       }
     },
-    "/api/info": {
+    "/info": {
       "get": {
+        "tags": [
+          "config"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -37,8 +43,11 @@
         }
       }
     },
-    "/api/config": {
+    "/config": {
       "put": {
+        "tags": [
+          "config"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -63,11 +72,18 @@
         }
       }
     },
-    "/api/sounds/{sound}": {
-      "get": {}
-    },
-    "/api/mcp-config": {
+    "/sounds/{sound}": {
       "get": {
+        "tags": [
+          "config"
+        ]
+      }
+    },
+    "/mcp-config": {
+      "get": {
+        "tags": [
+          "config"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -93,6 +109,9 @@
         }
       },
       "post": {
+        "tags": [
+          "config"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -128,8 +147,11 @@
         }
       }
     },
-    "/api/profiles": {
+    "/profiles": {
       "get": {
+        "tags": [
+          "config"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -144,6 +166,9 @@
         }
       },
       "put": {
+        "tags": [
+          "config"
+        ],
         "requestBody": {
           "content": {
             "text/plain; charset=utf-8": {}
@@ -164,8 +189,11 @@
         }
       }
     },
-    "/api/editors/check-availability": {
+    "/editors/check-availability": {
       "get": {
+        "tags": [
+          "config"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -191,8 +219,11 @@
         }
       }
     },
-    "/api/agents/preset-options": {
+    "/agents/preset-options": {
       "get": {
+        "tags": [
+          "config"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -229,8 +260,11 @@
         }
       }
     },
-    "/api/containers/info": {
+    "/containers/info": {
       "get": {
+        "tags": [
+          "containers"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -256,8 +290,11 @@
         }
       }
     },
-    "/api/containers/attempt-context": {
+    "/containers/attempt-context": {
       "get": {
+        "tags": [
+          "containers"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -283,8 +320,11 @@
         }
       }
     },
-    "/api/workspaces": {
+    "/workspaces": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -299,6 +339,9 @@
         }
       },
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -323,8 +366,11 @@
         }
       }
     },
-    "/api/workspaces/start": {
+    "/workspaces/start": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -349,8 +395,11 @@
         }
       }
     },
-    "/api/workspaces/from-pr": {
+    "/workspaces/from-pr": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -375,8 +424,11 @@
         }
       }
     },
-    "/api/workspaces/summaries": {
+    "/workspaces/summaries": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "description": "Request for fetching workspace summaries",
           "content": {
@@ -402,8 +454,11 @@
         }
       }
     },
-    "/api/workspaces/{id}": {
+    "/workspaces/{id}": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -418,6 +473,9 @@
         }
       },
       "put": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -442,6 +500,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "workspaces"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -464,8 +525,11 @@
         ]
       }
     },
-    "/api/workspaces/{id}/messages/first": {
+    "/workspaces/{id}/messages/first": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -480,8 +544,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/seen": {
+    "/workspaces/{id}/seen": {
       "put": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -496,8 +563,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/status": {
+    "/workspaces/{id}/git/status": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -512,8 +582,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/merge": {
+    "/workspaces/{id}/git/merge": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -538,8 +611,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/push": {
+    "/workspaces/{id}/git/push": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -564,8 +640,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/push/force": {
+    "/workspaces/{id}/git/push/force": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -590,8 +669,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/rebase": {
+    "/workspaces/{id}/git/rebase": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -616,8 +698,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/rebase/continue": {
+    "/workspaces/{id}/git/rebase/continue": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -642,8 +727,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/conflicts/abort": {
+    "/workspaces/{id}/git/conflicts/abort": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -668,8 +756,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/target-branch": {
+    "/workspaces/{id}/git/target-branch": {
       "put": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -694,8 +785,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/git/branch": {
+    "/workspaces/{id}/git/branch": {
       "put": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -720,8 +814,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/execution/dev-server/start": {
+    "/workspaces/{id}/execution/dev-server/start": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -736,8 +833,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/execution/cleanup": {
+    "/workspaces/{id}/execution/cleanup": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -752,8 +852,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/execution/archive": {
+    "/workspaces/{id}/execution/archive": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -768,8 +871,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/execution/stop": {
+    "/workspaces/{id}/execution/stop": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -784,8 +890,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/integration/editor/open": {
+    "/workspaces/{id}/integration/editor/open": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -810,8 +919,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/integration/agent/setup": {
+    "/workspaces/{id}/integration/agent/setup": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -836,8 +948,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/integration/github/cli/setup": {
+    "/workspaces/{id}/integration/github/cli/setup": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -852,8 +967,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/repos": {
+    "/workspaces/{id}/repos": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -868,6 +986,9 @@
         }
       },
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -892,8 +1013,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/pull-requests": {
+    "/workspaces/{id}/pull-requests": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -918,8 +1042,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/pull-requests/attach": {
+    "/workspaces/{id}/pull-requests/attach": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -944,8 +1071,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/pull-requests/comments": {
+    "/workspaces/{id}/pull-requests/comments": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -972,8 +1102,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/images": {
+    "/workspaces/{id}/images": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -988,8 +1121,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/images/associate": {
+    "/workspaces/{id}/images/associate": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1014,8 +1150,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/images/import-issue-attachments": {
+    "/workspaces/{id}/images/import-issue-attachments": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1040,8 +1179,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/images/metadata": {
+    "/workspaces/{id}/images/metadata": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1079,8 +1221,11 @@
         }
       }
     },
-    "/api/workspaces/{id}/images/file/{*path}": {
+    "/workspaces/{id}/images/file/{*path}": {
       "get": {
+        "tags": [
+          "workspaces"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1095,8 +1240,11 @@
         ]
       }
     },
-    "/api/workspaces/{id}/links": {
+    "/workspaces/{id}/links": {
       "post": {
+        "tags": [
+          "workspaces"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1121,6 +1269,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "workspaces"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1135,8 +1286,11 @@
         }
       }
     },
-    "/api/execution-processes/{id}": {
+    "/execution-processes/{id}": {
       "get": {
+        "tags": [
+          "execution-processes"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1151,8 +1305,11 @@
         }
       }
     },
-    "/api/execution-processes/{id}/stop": {
+    "/execution-processes/{id}/stop": {
       "post": {
+        "tags": [
+          "execution-processes"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1167,8 +1324,11 @@
         }
       }
     },
-    "/api/tags": {
+    "/tags": {
       "get": {
+        "tags": [
+          "tags"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1197,6 +1357,9 @@
         }
       },
       "post": {
+        "tags": [
+          "tags"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1221,8 +1384,11 @@
         }
       }
     },
-    "/api/tags/{tag_id}": {
+    "/tags/{tag_id}": {
       "put": {
+        "tags": [
+          "tags"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1247,6 +1413,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "tags"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1261,8 +1430,11 @@
         }
       }
     },
-    "/api/auth/handoff/init": {
+    "/auth/handoff/init": {
       "post": {
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1287,8 +1459,11 @@
         }
       }
     },
-    "/api/auth/handoff/complete": {
+    "/auth/handoff/complete": {
       "get": {
+        "tags": [
+          "auth"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1327,11 +1502,18 @@
         ]
       }
     },
-    "/api/auth/logout": {
-      "post": {}
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ]
+      }
     },
-    "/api/auth/status": {
+    "/auth/status": {
       "get": {
+        "tags": [
+          "auth"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1346,8 +1528,11 @@
         }
       }
     },
-    "/api/auth/token": {
+    "/auth/token": {
       "get": {
+        "tags": [
+          "auth"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1362,8 +1547,11 @@
         }
       }
     },
-    "/api/auth/user": {
+    "/auth/user": {
       "get": {
+        "tags": [
+          "auth"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1378,8 +1566,11 @@
         }
       }
     },
-    "/api/organizations": {
+    "/organizations": {
       "get": {
+        "tags": [
+          "organizations"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1394,6 +1585,9 @@
         }
       },
       "post": {
+        "tags": [
+          "organizations"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1418,8 +1612,11 @@
         }
       }
     },
-    "/api/organizations/{id}": {
+    "/organizations/{id}": {
       "get": {
+        "tags": [
+          "organizations"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1433,8 +1630,15 @@
           }
         }
       },
-      "delete": {},
+      "delete": {
+        "tags": [
+          "organizations"
+        ]
+      },
       "patch": {
+        "tags": [
+          "organizations"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1459,8 +1663,11 @@
         }
       }
     },
-    "/api/organizations/{org_id}/invitations": {
+    "/organizations/{org_id}/invitations": {
       "get": {
+        "tags": [
+          "organizations"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1475,6 +1682,9 @@
         }
       },
       "post": {
+        "tags": [
+          "organizations"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1499,8 +1709,11 @@
         }
       }
     },
-    "/api/organizations/{org_id}/invitations/revoke": {
+    "/organizations/{org_id}/invitations/revoke": {
       "post": {
+        "tags": [
+          "organizations"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1513,8 +1726,11 @@
         }
       }
     },
-    "/api/invitations/{token}": {
+    "/invitations/{token}": {
       "get": {
+        "tags": [
+          "organizations"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1529,8 +1745,11 @@
         }
       }
     },
-    "/api/invitations/{token}/accept": {
+    "/invitations/{token}/accept": {
       "post": {
+        "tags": [
+          "organizations"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1545,8 +1764,11 @@
         }
       }
     },
-    "/api/organizations/{org_id}/members": {
+    "/organizations/{org_id}/members": {
       "get": {
+        "tags": [
+          "organizations"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1561,11 +1783,18 @@
         }
       }
     },
-    "/api/organizations/{org_id}/members/{user_id}": {
-      "delete": {}
+    "/organizations/{org_id}/members/{user_id}": {
+      "delete": {
+        "tags": [
+          "organizations"
+        ]
+      }
     },
-    "/api/organizations/{org_id}/members/{user_id}/role": {
+    "/organizations/{org_id}/members/{user_id}/role": {
       "patch": {
+        "tags": [
+          "organizations"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1590,8 +1819,11 @@
         }
       }
     },
-    "/api/filesystem/directory": {
+    "/filesystem/directory": {
       "get": {
+        "tags": [
+          "filesystem"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1619,8 +1851,11 @@
         }
       }
     },
-    "/api/filesystem/git-repos": {
+    "/filesystem/git-repos": {
       "get": {
+        "tags": [
+          "filesystem"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1648,8 +1883,11 @@
         }
       }
     },
-    "/api/repos": {
+    "/repos": {
       "get": {
+        "tags": [
+          "repos"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1664,6 +1902,9 @@
         }
       },
       "post": {
+        "tags": [
+          "repos"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1688,8 +1929,11 @@
         }
       }
     },
-    "/api/repos/recent": {
+    "/repos/recent": {
       "get": {
+        "tags": [
+          "repos"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1704,8 +1948,11 @@
         }
       }
     },
-    "/api/repos/init": {
+    "/repos/init": {
       "post": {
+        "tags": [
+          "repos"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1730,8 +1977,11 @@
         }
       }
     },
-    "/api/repos/batch": {
+    "/repos/batch": {
       "post": {
+        "tags": [
+          "repos"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1756,8 +2006,11 @@
         }
       }
     },
-    "/api/repos/{repo_id}": {
+    "/repos/{repo_id}": {
       "get": {
+        "tags": [
+          "repos"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1771,10 +2024,17 @@
           }
         }
       },
-      "delete": {}
+      "delete": {
+        "tags": [
+          "repos"
+        ]
+      }
     },
-    "/api/repos/{repo_id}/prs": {
+    "/repos/{repo_id}/prs": {
       "get": {
+        "tags": [
+          "repos"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1802,8 +2062,11 @@
         }
       }
     },
-    "/api/repos/{repo_id}/open-editor": {
+    "/repos/{repo_id}/open-editor": {
       "post": {
+        "tags": [
+          "repos"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1835,8 +2098,11 @@
         }
       }
     },
-    "/api/approvals/{id}/respond": {
+    "/approvals/{id}/respond": {
       "post": {
+        "tags": [
+          "approvals"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1861,8 +2127,11 @@
         }
       }
     },
-    "/api/search": {
+    "/search": {
       "get": {
+        "tags": [
+          "search"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1906,8 +2175,11 @@
         }
       }
     },
-    "/api/releases": {
+    "/releases": {
       "get": {
+        "tags": [
+          "releases"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1922,8 +2194,11 @@
         }
       }
     },
-    "/api/migration/start": {
+    "/migration/start": {
       "post": {
+        "tags": [
+          "migration"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1948,8 +2223,11 @@
         }
       }
     },
-    "/api/sessions": {
+    "/sessions": {
       "get": {
+        "tags": [
+          "sessions"
+        ],
         "parameters": [
           {
             "in": "query",
@@ -1976,6 +2254,9 @@
         }
       },
       "post": {
+        "tags": [
+          "sessions"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2000,8 +2281,11 @@
         }
       }
     },
-    "/api/sessions/{session_id}": {
+    "/sessions/{session_id}": {
       "get": {
+        "tags": [
+          "sessions"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2016,8 +2300,11 @@
         }
       }
     },
-    "/api/sessions/{session_id}/follow-up": {
+    "/sessions/{session_id}/follow-up": {
       "post": {
+        "tags": [
+          "sessions"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2042,8 +2329,11 @@
         }
       }
     },
-    "/api/sessions/{session_id}/reset": {
+    "/sessions/{session_id}/reset": {
       "post": {
+        "tags": [
+          "sessions"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2068,8 +2358,11 @@
         }
       }
     },
-    "/api/sessions/{session_id}/setup": {
+    "/sessions/{session_id}/setup": {
       "post": {
+        "tags": [
+          "sessions"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2084,8 +2377,11 @@
         }
       }
     },
-    "/api/sessions/{session_id}/review": {
+    "/sessions/{session_id}/review": {
       "post": {
+        "tags": [
+          "sessions"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2110,8 +2406,11 @@
         }
       }
     },
-    "/api/sessions/{session_id}/{session_id}/queue": {
+    "/sessions/{session_id}/{session_id}/queue": {
       "get": {
+        "tags": [
+          "sessions"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2126,6 +2425,9 @@
         }
       },
       "post": {
+        "tags": [
+          "sessions"
+        ],
         "requestBody": {
           "description": "Request body for queueing a follow-up message",
           "content": {
@@ -2151,6 +2453,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "sessions"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2165,8 +2470,11 @@
         }
       }
     },
-    "/api/relay-auth/enrollment-code": {
+    "/relay-auth/enrollment-code": {
       "post": {
+        "tags": [
+          "relay-auth"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2181,8 +2489,11 @@
         }
       }
     },
-    "/api/relay-auth/clients": {
+    "/relay-auth/clients": {
       "get": {
+        "tags": [
+          "relay-auth"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2197,8 +2508,11 @@
         }
       }
     },
-    "/api/relay-auth/clients/{client_id}": {
+    "/relay-auth/clients/{client_id}": {
       "delete": {
+        "tags": [
+          "relay-auth"
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2213,8 +2527,11 @@
         }
       }
     },
-    "/api/relay-auth/spake2/start": {
+    "/relay-auth/spake2/start": {
       "post": {
+        "tags": [
+          "relay-auth"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2239,8 +2556,11 @@
         }
       }
     },
-    "/api/relay-auth/spake2/finish": {
+    "/relay-auth/spake2/finish": {
       "post": {
+        "tags": [
+          "relay-auth"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2265,8 +2585,11 @@
         }
       }
     },
-    "/api/relay-auth/signing-session/refresh": {
+    "/relay-auth/signing-session/refresh": {
       "post": {
+        "tags": [
+          "relay-auth"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2291,11 +2614,18 @@
         }
       }
     },
-    "/api/images/{id}/file": {
-      "get": {}
+    "/images/{id}/file": {
+      "get": {
+        "tags": [
+          "images"
+        ]
+      }
     },
-    "/api/images/{id}": {
+    "/images/{id}": {
       "delete": {
+        "tags": [
+          "images"
+        ],
         "responses": {
           "200": {
             "description": "",

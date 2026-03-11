@@ -177,5 +177,10 @@ async fn send_error(socket: &mut SignedWebSocket, message: &str) -> anyhow::Resu
 }
 
 pub fn router() -> ApiRouter<DeploymentImpl> {
-    ApiRouter::new().route("/terminal/ws", axum_get(terminal_ws))
+    ApiRouter::new()
+        .route("/terminal/ws", axum_get(terminal_ws))
+        .with_path_items(|p| p.tag("terminal"))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

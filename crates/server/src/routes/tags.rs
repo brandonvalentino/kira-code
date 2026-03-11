@@ -106,7 +106,9 @@ pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
         .api_route("/", get(get_tags).post(create_tag))
         .nest("/{tag_id}", tag_router);
 
-    ApiRouter::new().nest("/tags", inner)
+    ApiRouter::new()
+        .nest("/tags", inner)
+        .with_path_items(|p| p.tag("tags"))
 }
 
 pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
@@ -116,5 +118,7 @@ pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
         .api_route("/", get(get_tags).post(create_tag))
         .nest("/{tag_id}", tag_router);
 
-    ApiRouter::new().nest("/tags", inner)
+    ApiRouter::new()
+        .nest("/tags", inner)
+        .with_path_items(|p| p.tag("tags"))
 }

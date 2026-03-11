@@ -9,5 +9,11 @@ pub async fn health_check() -> Json<ApiResponse<String>> {
 }
 
 pub fn router() -> ApiRouter<DeploymentImpl> {
-    ApiRouter::new().api_route("/health", get(health_check))
+    ApiRouter::new()
+        .api_route("/health", get(health_check))
+        .with_path_items(|p| p.tag("health"))
+        .with_path_items(|p| p.tag("health"))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

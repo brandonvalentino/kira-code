@@ -292,7 +292,9 @@ pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
         )
         .nest("/{id}", workspace_id_router);
 
-    ApiRouter::new().nest("/execution-processes", workspaces_router)
+    ApiRouter::new()
+        .nest("/execution-processes", workspaces_router)
+        .with_path_items(|p| p.tag("execution-processes"))
 }
 
 pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
@@ -316,5 +318,7 @@ pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
         .route("/stream/session/ws", session_ws)
         .nest("/{id}", workspace_id_router);
 
-    ApiRouter::new().nest("/execution-processes", workspaces_router)
+    ApiRouter::new()
+        .nest("/execution-processes", workspaces_router)
+        .with_path_items(|p| p.tag("execution-processes"))
 }

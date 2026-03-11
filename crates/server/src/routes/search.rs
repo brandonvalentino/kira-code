@@ -71,9 +71,12 @@ pub async fn search_files(
 pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
     ApiRouter::new()
         .api_route("/search", get(search_files))
+        .with_path_items(|p| p.tag("search"))
         .with_state(deployment.clone())
 }
 
 pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
-    ApiRouter::new().api_route("/search", get(search_files))
+    ApiRouter::new()
+        .api_route("/search", get(search_files))
+        .with_path_items(|p| p.tag("search"))
 }

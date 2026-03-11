@@ -23,4 +23,5 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
         .merge(pull_requests::router())
         .merge(tags::router())
         .merge(workspaces::router())
+        .with_path_items(|p| p.tag("remote"))
 }

@@ -119,6 +119,7 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
             "/relay-auth/signing-session/refresh",
             post(refresh_relay_signing_session),
         )
+        .with_path_items(|p| p.tag("relay-auth"))
 }
 
 async fn generate_enrollment_code(
@@ -353,4 +354,7 @@ fn is_relay_request(headers: &HeaderMap) -> bool {
         .get(RELAY_HEADER)
         .and_then(|value| value.to_str().ok())
         .is_some_and(|value| value.trim() == "1")
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

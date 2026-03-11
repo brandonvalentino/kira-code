@@ -113,4 +113,8 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
     ApiRouter::new()
         .api_route("/approvals/{id}/respond", post(respond_to_approval))
         .route("/approvals/stream/ws", axum_get(stream_approvals_ws))
+        .with_path_items(|p| p.tag("approvals"))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

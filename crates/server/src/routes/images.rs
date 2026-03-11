@@ -167,4 +167,5 @@ pub fn routes() -> ApiRouter<DeploymentImpl> {
         )
         .api_route("/{id}/file", get(serve_image))
         .api_route("/{id}", delete(delete_image))
+        .with_path_items(|p| p.tag("images"))
 }

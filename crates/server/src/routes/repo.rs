@@ -342,4 +342,8 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
         .api_route("/repos/{repo_id}/prs", get(list_open_prs))
         .route("/repos/{repo_id}/search", axum_get(search_repo))
         .api_route("/repos/{repo_id}/open-editor", post(open_repo_in_editor))
+        .with_path_items(|p| p.tag("repos"))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

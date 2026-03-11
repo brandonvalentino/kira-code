@@ -75,4 +75,8 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
     ApiRouter::new()
         .api_route("/filesystem/directory", get(list_directory))
         .api_route("/filesystem/git-repos", get(list_git_repos))
+        .with_path_items(|p| p.tag("filesystem"))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

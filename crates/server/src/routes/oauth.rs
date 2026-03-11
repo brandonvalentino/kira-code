@@ -44,6 +44,7 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
         .api_route("/auth/status", get(status))
         .api_route("/auth/token", get(get_token))
         .api_route("/auth/user", get(get_current_user))
+        .with_path_items(|p| p.tag("auth"))
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -385,4 +386,7 @@ fn close_window_response(message: String) -> Response<String> {
         .header("content-type", "text/html; charset=utf-8")
         .body(body)
         .unwrap()
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

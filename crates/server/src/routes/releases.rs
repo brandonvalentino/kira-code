@@ -34,7 +34,10 @@ fn cache() -> &'static RwLock<Option<(Vec<GitHubRelease>, Instant)>> {
 }
 
 pub fn router() -> ApiRouter<DeploymentImpl> {
-    ApiRouter::new().api_route("/releases", get(get_releases))
+    ApiRouter::new()
+        .with_path_items(|p| p.tag("releases"))
+        .api_route("/releases", get(get_releases))
+        .with_path_items(|p| p.tag("releases"))
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
@@ -125,4 +128,7 @@ async fn fetch_releases() -> Result<Vec<GitHubRelease>, reqwest::Error> {
             body: r.body.unwrap_or_default(),
         })
         .collect())
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

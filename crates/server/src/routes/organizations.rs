@@ -47,6 +47,7 @@ pub fn router() -> ApiRouter<DeploymentImpl> {
             "/organizations/{org_id}/members/{user_id}/role",
             patch(update_member_role),
         )
+        .with_path_items(|p| p.tag("organizations"))
 }
 
 async fn list_organizations(
@@ -215,4 +216,7 @@ async fn update_member_role(
     let response = client.update_member_role(org_id, user_id, &request).await?;
 
     Ok(ResponseJson(ApiResponse::success(response)))
+}
+pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
+    router()
 }

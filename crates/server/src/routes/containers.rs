@@ -54,10 +54,12 @@ pub fn router(_deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
         // Do not remove this endpoint without updating the extension.
         .api_route("/containers/info", get(get_container_info))
         .api_route("/containers/attempt-context", get(get_context))
+        .with_path_items(|p| p.tag("containers"))
 }
 
 pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
     ApiRouter::new()
         .api_route("/containers/info", get(get_container_info))
         .api_route("/containers/attempt-context", get(get_context))
+        .with_path_items(|p| p.tag("containers"))
 }

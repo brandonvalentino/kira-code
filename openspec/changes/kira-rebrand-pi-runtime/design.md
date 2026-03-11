@@ -62,6 +62,33 @@ The Pi Coding Agent (`@mariozechner/pi-coding-agent`) exposes a TypeScript SDK (
 ### D7: Rebrand string replacement
 **Decision**: Automated grep-and-replace for "Vibe Kanban" / "vibe-kanban" / "vibekanban" / "VibeKanban" / "VK_" across all sources, followed by manual review of user-visible strings.
 
+### D8: Replace GitHub/Google OAuth with Keycloak
+**Decision**: Remove `GitHubOAuthProvider` and `GoogleOAuthProvider` entirely. Replace with a single `KeycloakOAuthProvider` using the `openidconnect` crate. Keycloak becomes the sole identity provider.
+**Rationale**: Keycloak is a production-grade identity broker — it can federate GitHub, Google, LDAP, SAML, and any other identity source internally. Instead of Kira Code maintaining N OAuth integrations, we delegate all identity concerns to Keycloak. The codebase gets simpler (one provider, one code path) and enterprises get full control over their auth policies without code changes to Kira.
+
+The `openidconnect` crate is the right library here because:
+- **OIDC discovery** (`/.well-known/openid-configuration`) handles Keycloak's per-realm endpoint variation automatically — no hardcoded URLs.
+- **ID token verification** with JWKS is built in — replaces manual `fetch_user()` calls to provider APIs.
+- **77k+ downloads, 507 GitHub stars, actively maintained** — the de facto Rust OIDC library.
+- Our async Axum stack is compatible: `CoreProviderMetadata::discover_async()` + `request_async()`.
+
+**What gets removed**:
+- `GitHubOAuthProvider` and `GoogleOAuthProvider` from `provider.rs`
+- `GITHUB_OAUTH_CLIENT_ID/SECRET` and `GOOGLE_OAUTH_CLIENT_ID/SECRET` env vars
+- `github` and `google` fields from `AuthConfig` in `config.rs`
+- GitHub/Google login buttons from `packages/remote-web`
+
+**What gets added**:
+- `KeycloakOAuthProvider` implementing the existing `AuthorizationProvider` trait via `openidconnect`
+- `KEYCLOAK_ISSUER_URL` (e.g. `https://keycloak.example.com/realms/kira`), `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET` env vars
+- `keycloak` field in `AuthConfig`; `ConfigError::NoKeycloakConfig` replaces `NoOAuthProviders`
+- Single "Sign in with Keycloak" button in `packages/remote-web`
+
+**Alternatives considered**:
+- *Keep GitHub/Google, add Keycloak alongside* — Keeps three providers to maintain; defeats the purpose of centralising identity.
+- *`axum-keycloak-auth`* — Only handles JWT validation middleware, not the full OAuth2 authorization code flow needed by `OAuthHandoffService`.
+- *Manual implementation* — Brittle against Keycloak's JWKS rotation and OIDC discovery document changes.
+
 ## Architecture
 
 ```

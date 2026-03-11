@@ -59,7 +59,9 @@ pub fn router(deployment: &DeploymentImpl) -> ApiRouter<DeploymentImpl> {
         .nest("/{id}/images", images::router(deployment))
         .nest("/{id}/links", links::router(deployment));
 
-    ApiRouter::new().nest("/workspaces", workspaces_router)
+    ApiRouter::new()
+        .nest("/workspaces", workspaces_router)
+        .with_path_items(|p| p.tag("workspaces"))
 }
 
 pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
@@ -97,5 +99,7 @@ pub fn router_for_spec() -> ApiRouter<DeploymentImpl> {
         .nest("/{id}/images", images::router_for_spec())
         .nest("/{id}/links", links::router_for_spec());
 
-    ApiRouter::new().nest("/workspaces", workspaces_router)
+    ApiRouter::new()
+        .nest("/workspaces", workspaces_router)
+        .with_path_items(|p| p.tag("workspaces"))
 }

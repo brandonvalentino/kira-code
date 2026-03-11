@@ -39,6 +39,7 @@ This change does two things:
 ### Modified Capabilities
 
 - `cloud-auth`: Auth layer already present in `crates/remote`; extended to cover the new agent WebSocket endpoint.
+- `keycloak-integration`: Replace GitHub and Google OAuth entirely with Keycloak as the sole authentication provider.
 
 ## Impact
 
