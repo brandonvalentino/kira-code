@@ -1,11 +1,11 @@
 ## 1. Rebrand — String & Metadata Replacement
 
-- [ ] 1.1 Run automated replace of all "Vibe Kanban" / "vibe-kanban" / "vibekanban" / "VibeKanban" / "VK_" occurrences across Rust sources, TypeScript sources, JSON, TOML, Markdown, and Dockerfiles
-- [ ] 1.2 Update `name`, `description`, and `repository` in all `Cargo.toml` crate manifests to use `kira-` prefix
-- [ ] 1.3 Update `name`, `description`, and `repository` in all `package.json` files (local-web, remote-web, web-core, npx-cli)
-- [ ] 1.4 Update Docker image tags and CI workflow names to `kira-code`
-- [ ] 1.5 Add `VK_` → `KIRA_` env-var fallback shim with deprecation warning in `crates/server` and `crates/remote` config parsing
-- [ ] 1.6 Verify: `grep -r "vibe.kanban\|VibeKanban\|vibekanban" --include="*.ts" --include="*.tsx" --include="*.rs" --include="*.toml" --include="*.json"` returns zero matches
+- [x] 1.1 Run automated replace of all "Vibe Kanban" / "vibe-kanban" / "vibekanban" / "VibeKanban" / "VK_" occurrences across Rust sources, TypeScript sources, JSON, TOML, Markdown, and Dockerfiles
+- [x] 1.2 Update `name`, `description`, and `repository` in all `Cargo.toml` crate manifests to use `kira-` prefix
+- [x] 1.3 Update `name`, `description`, and `repository` in all `package.json` files (local-web, remote-web, web-core, npx-cli)
+- [x] 1.4 Update Docker image tags and CI workflow names to `kira-code`
+- [x] 1.5 Add `VK_` → `KIRA_` env-var fallback shim with deprecation warning in `crates/server` and `crates/remote` config parsing
+- [x] 1.6 Verify: `grep -r "vibe.kanban\|VibeKanban\|vibekanban" --include="*.ts" --include="*.tsx" --include="*.rs" --include="*.toml" --include="*.json"` returns zero matches
 
 ## 2. Bundle Pi as a Managed Binary
 

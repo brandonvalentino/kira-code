@@ -9,12 +9,15 @@ fn main() {
     if let Ok(api_endpoint) = std::env::var("POSTHOG_API_ENDPOINT") {
         println!("cargo:rustc-env=POSTHOG_API_ENDPOINT={}", api_endpoint);
     }
-    if let Ok(vk_shared_api_base) = std::env::var("VK_SHARED_API_BASE") {
-        println!("cargo:rustc-env=VK_SHARED_API_BASE={}", vk_shared_api_base);
-    }
-    if let Ok(vk_shared_relay_api_base) = std::env::var("VK_SHARED_RELAY_API_BASE") {
+    if let Ok(vk_shared_api_base) = std::env::var("KIRA_SHARED_API_BASE") {
         println!(
-            "cargo:rustc-env=VK_SHARED_RELAY_API_BASE={}",
+            "cargo:rustc-env=KIRA_SHARED_API_BASE={}",
+            vk_shared_api_base
+        );
+    }
+    if let Ok(vk_shared_relay_api_base) = std::env::var("KIRA_SHARED_RELAY_API_BASE") {
+        println!(
+            "cargo:rustc-env=KIRA_SHARED_RELAY_API_BASE={}",
             vk_shared_relay_api_base
         );
     }
@@ -28,7 +31,7 @@ fn main() {
         // Create a dummy index.html
         let dummy_html = r#"<!DOCTYPE html>
 <html><head><title>Build web app first</title></head>
-<body><h1>Please build @vibe/local-web first</h1></body></html>"#;
+<body><h1>Please build @kira/local-web first</h1></body></html>"#;
 
         fs::write(dist_path.join("index.html"), dummy_html).unwrap();
     }

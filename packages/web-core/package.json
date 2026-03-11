@@ -1,5 +1,5 @@
 {
-  "name": "@vibe/web-core",
+  "name": "@kira/web-core",
   "private": true,
   "version": "0.1.18",
   "type": "module",

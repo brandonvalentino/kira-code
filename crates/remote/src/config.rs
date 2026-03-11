@@ -4,6 +4,28 @@ use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64_STANDARD};
 use secrecy::SecretString;
 use thiserror::Error;
 
+/// Get an environment variable with fallback support for legacy VK_ prefixed names.
+/// If the KIRA_ variable is not set, tries the VK_ variant and logs a deprecation warning.
+fn env_with_fallback(kira_name: &str, vk_name: &str) -> Result<String, env::VarError> {
+    match env::var(kira_name) {
+        Ok(value) => Ok(value),
+        Err(env::VarError::NotPresent) => {
+            match env::var(vk_name) {
+                Ok(value) => {
+                    tracing::warn!(
+                        "Using deprecated environment variable '{}'; please use '{}' instead",
+                        vk_name,
+                        kira_name
+                    );
+                    Ok(value)
+                }
+                Err(e) => Err(e),
+            }
+        }
+        Err(e) => Err(e),
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct RemoteServerConfig {
     pub database_url: String,
@@ -202,6 +224,7 @@ impl RemoteServerConfig {
     pub fn from_env() -> Result<Self, ConfigError> {
         let database_url = env::var("SERVER_DATABASE_URL")
             .or_else(|_| env::var("DATABASE_URL"))
+            .or_else(|_| env_with_fallback("KIRACODE_DATABASE_URL", "VK_DATABASE_URL"))
             .map_err(|_| ConfigError::MissingVar("SERVER_DATABASE_URL"))?;
 
         let listen_addr =
@@ -316,7 +339,7 @@ pub struct AuthConfig {
 
 impl AuthConfig {
     fn from_env() -> Result<Self, ConfigError> {
-        let jwt_secret = env::var("KIRACODE_REMOTE_JWT_SECRET")
+        let jwt_secret = env_with_fallback("KIRACODE_REMOTE_JWT_SECRET", "VK_REMOTE_JWT_SECRET")
             .map_err(|_| ConfigError::MissingVar("KIRACODE_REMOTE_JWT_SECRET"))?;
         validate_jwt_secret(&jwt_secret)?;
         let jwt_secret = SecretString::new(jwt_secret.into());

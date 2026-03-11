@@ -29,9 +29,9 @@ pub fn effective_relay_host_name(config: &Config, user_id: &str) -> String {
 }
 
 fn relay_api_base() -> Option<String> {
-    std::env::var("VK_SHARED_RELAY_API_BASE")
+    std::env::var("KIRA_SHARED_RELAY_API_BASE")
         .ok()
-        .or_else(|| option_env!("VK_SHARED_RELAY_API_BASE").map(|s| s.to_string()))
+        .or_else(|| option_env!("KIRA_SHARED_RELAY_API_BASE").map(|s| s.to_string()))
 }
 
 struct RelayParams {
@@ -53,7 +53,7 @@ async fn resolve_relay_params(deployment: &DeploymentImpl) -> Option<RelayParams
     drop(config);
 
     let relay_base = relay_api_base().or_else(|| {
-        tracing::debug!("VK_SHARED_RELAY_API_BASE not set; relay unavailable");
+        tracing::debug!("KIRA_SHARED_RELAY_API_BASE not set; relay unavailable");
         None
     })?;
 

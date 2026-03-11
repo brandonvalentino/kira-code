@@ -58,7 +58,7 @@ This starts PostgreSQL, ElectricSQL, the Remote Server, and the Relay Server.
 To connect the desktop client to your local remote server (without relay/tunnel):
 
 ```bash
-export VK_SHARED_API_BASE=http://localhost:3000
+export KIRA_SHARED_API_BASE=http://localhost:3000
 
 pnpm run dev
 ```
@@ -141,8 +141,8 @@ Open **https://localhost:3001** in your browser.
 To test relay/tunnel mode end-to-end:
 
 ```bash
-export VK_SHARED_API_BASE=https://localhost:3001
-export VK_SHARED_RELAY_API_BASE=https://relay.localhost:3001
+export KIRA_SHARED_API_BASE=https://localhost:3001
+export KIRA_SHARED_RELAY_API_BASE=https://relay.localhost:3001
 
 pnpm run dev
 ```

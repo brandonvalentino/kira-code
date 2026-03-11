@@ -517,7 +517,7 @@ async fn http_proxy_handler(target_port: u16, path_str: String, request: Request
 
                 // Inject Eruda CDN, init, devtools and click-to-component scripts before </body>
                 if let Some(pos) = html.to_lowercase().rfind("</body>") {
-                    let nav_script_disabled = env_flag_enabled("VK_PREVIEW_DISABLE_NAV_SCRIPT");
+                    let nav_script_disabled = env_flag_enabled("KIRA_PREVIEW_DISABLE_NAV_SCRIPT");
                     let scripts = if nav_script_disabled {
                         format!(
                             "<script src=\"https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.js\"></script><script>{}</script><script>{}</script>",

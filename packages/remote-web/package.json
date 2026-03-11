@@ -1,5 +1,5 @@
 {
-  "name": "@vibe/remote-web",
+  "name": "@kira/remote-web",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -20,7 +20,7 @@
     "@tanstack/react-router": "^1.161.1",
     "@tanstack/zod-adapter": "^1.161.1",
     "@kira/ui": "workspace:*",
-    "@vibe/web-core": "workspace:*",
+    "@kira/web-core": "workspace:*",
     "clsx": "^2.1.1",
     "posthog-js": "^1.283.0",
     "prettier": "^3.6.1",

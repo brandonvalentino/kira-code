@@ -331,11 +331,7 @@ export function LandingPage() {
         <div className="rounded-sm border border-border bg-secondary p-double space-y-double">
           <header className="space-y-double">
             <div className="flex justify-center">
-              <img
-                src={logoSrc}
-                alt="Kira Code"
-                className="h-8 w-auto logo"
-              />
+              <img src={logoSrc} alt="Kira Code" className="h-8 w-auto logo" />
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2">
               {SOCIAL_LINKS.map((link) => (
