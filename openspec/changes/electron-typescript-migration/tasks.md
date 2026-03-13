@@ -1,151 +1,246 @@
-## 1. Project Structure & Shared Foundation
+## Implementation Tasks
 
-- [ ] 1.1 Create `packages/shared/` directory with `package.json`, `tsconfig.json`
-- [ ] 1.2 Create `packages/shared/types.ts` with core types (Issue, Project, Tag, Session, etc.)
-- [ ] 1.3 Create `packages/shared/schemas.ts` with Zod validation schemas
-- [ ] 1.4 Create `packages/shared/utils.ts` with shared utility functions
-- [ ] 1.5 Update `pnpm-workspace.yaml` to include new packages
-- [ ] 1.6 Remove ts-rs dependencies from remaining Rust crates (if any shared)
-- [ ] 1.7 Delete `crates/api-types/` (replaced by `packages/shared/`)
+Priority legend:
+- 🔴 **P0** - Critical path, blocks other work
+- 🟠 **P1** - Core functionality, needed for MVP
+- 🟡 **P2** - Important, enhances experience
+- 🟢 **P3** - Nice-to-have, polish
 
-## 2. Cloud API (packages/cloud-api/)
+---
 
-- [ ] 2.1 Create `packages/cloud-api/` directory with `package.json`, `tsconfig.json`
-- [ ] 2.2 Setup Hono server with basic middleware (CORS, logging, error handling)
-- [ ] 2.3 Create database connection module with PostgreSQL pool (using `pg` or `postgres.js`)
-- [ ] 2.4 Port ElectricSQL proxy routes from `crates/remote/src/routes/electric_proxy.rs`
-- [ ] 2.5 Port shape definitions from `crates/remote/src/shapes.rs` to TypeScript
-- [ ] 2.6 Port mutation routes (issues, projects, tags, members, etc.) from `crates/remote/src/routes/`
-- [ ] 2.7 Implement Keycloak OAuth integration (port from `crates/remote/src/auth/`)
-- [ ] 2.8 Implement JWT validation middleware
-- [ ] 2.9 Implement agent event persistence (`POST /v1/internal/tasks/:id/events`)
-- [ ] 2.10 Implement WebSocket fan-out for agent events to remote-web
-- [ ] 2.11 Implement LiteLLM proxy token endpoint (`GET /v1/user/llm-token`)
-- [ ] 2.12 Implement internal server-to-server auth (`KIRA_INTERNAL_SECRET`)
-- [ ] 2.13 Port database migrations from `crates/remote/migrations/` to TypeScript migrations
-- [ ] 2.14 Create Dockerfile for cloud-api deployment
-- [ ] 2.15 Update docker-compose.yml to use cloud-api instead of crates/remote
-- [ ] 2.16 Add integration tests for API routes
+## Phase 1: Foundation (🔴 P0)
 
-## 3. Electron App (packages/electron-app/)
+### 1.1 Project Setup
+- [ ] Create `packages/local-server/` directory structure
+- [ ] Add `package.json` with dependencies (Hono, Drizzle, better-sqlite3, Pi SDK)
+- [ ] Add `tsconfig.json` for TypeScript
+- [ ] Create basic `src/index.ts` entry point
+- [ ] Verify `pnpm install` succeeds
+- [ ] Verify `pnpm run build` produces `dist/index.js`
 
-- [ ] 3.1 Create `packages/electron-app/` directory with `package.json`, `tsconfig.json`
-- [ ] 3.2 Setup Electron main process entry point (`src/main/index.ts`)
-- [ ] 3.3 Create Electron renderer entry point (port from `packages/local-web/`)
-- [ ] 3.4 Implement HTTP server in main process (Hono on localhost)
-- [ ] 3.5 Implement SQLite database with better-sqlite3
-- [ ] 3.6 Create database migrations for local tables (sessions, worktrees, settings, scratch)
-- [ ] 3.7 Implement session store (CRUD for agent sessions)
-- [ ] 3.8 Implement worktree manager (git worktree operations via simple-git)
-- [ ] 3.9 Implement settings store (key-value with JSON values)
-- [ ] 3.10 Implement scratch notes store
-- [ ] 3.11 Integrate Pi SDK (`@mariozechner/pi-coding-agent`)
-- [ ] 3.12 Implement Kira tools (`updateTaskStatus`, `requestHumanReview`, `logToKanban`)
-- [ ] 3.13 Implement Kira skills loader (markdown files bundled in app)
-- [ ] 3.14 Implement agent session manager (start, steer, abort, resume)
-- [ ] 3.15 Implement agent event streaming to renderer (IPC or HTTP WebSocket)
-- [ ] 3.16 Implement agent event push to cloud (HTTP POST)
-- [ ] 3.17 Implement ElectricSQL client for kanban sync
-- [ ] 3.18 Implement system tray integration
-- [ ] 3.19 Implement notifications (native OS notifications)
-- [ ] 3.20 Implement auto-update with electron-updater
-- [ ] 3.21 Implement deep links (`kira-code://` URL scheme)
-- [ ] 3.22 Implement file associations (optional, platform-specific)
-- [ ] 3.23 Implement Keycloak OAuth flow for cloud sync
-- [ ] 3.24 Configure electron-builder for platform builds (.dmg, .exe, .AppImage, .deb)
-- [ ] 3.25 Implement IPC bridge for renderer ↔ main communication
-- [ ] 3.26 Implement terminal integration (port from current terminal routes)
-- [ ] 3.27 Implement file tree operations (port from filesystem routes)
+### 1.2 Database Layer
+- [ ] Create `src/db/schema.ts` with Drizzle schema (match Rust exactly)
+- [ ] Create `src/db/index.ts` with database connection
+- [ ] Create `migrations/` directory with SQL migrations
+- [ ] Implement database path resolution (dev vs production)
+- [ ] Verify database file created on first run
+- [ ] Verify all tables created via migrations
+- [ ] Test insert and query for workspace
+- [ ] Test insert and query for repo
+- [ ] Verify foreign key constraints work
 
-## 4. Renderer (packages/electron-app/src/renderer/)
+### 1.3 HTTP Server
+- [ ] Create `src/server.ts` with Hono server
+- [ ] Add CORS middleware (allow localhost:3000, localhost:5173)
+- [ ] Add logger middleware
+- [ ] Create `src/routes/health.ts` with `/health` endpoint
+- [ ] Create `src/utils/response.ts` with API response helpers
+- [ ] Verify server starts on configurable port
+- [ ] Verify `/health` returns `{ "status": "ok" }`
 
-- [ ] 4.1 Port `packages/local-web/` to Electron renderer (minimal changes)
-- [ ] 4.2 Update API client to use Electron main process HTTP server
-- [ ] 4.3 Update WebSocket connection to use main process bridge
-- [ ] 4.4 Remove npx-cli specific code (if any)
-- [ ] 4.5 Update agent execution UI to render Pi SDK events
-- [ ] 4.6 Add Electron-specific UI (update available banner, system tray status)
-- [ ] 4.7 Test all existing UI functionality in Electron context
+---
 
-## 5. Remote Web (packages/remote-web/)
+## Phase 2: Core API Routes (🟠 P1)
 
-- [ ] 5.1 Update API client to use new cloud-api endpoints
-- [ ] 5.2 Remove relay-related code (already done in previous change, verify)
-- [ ] 5.3 Implement agent run history viewer
-- [ ] 5.4 Implement live agent event streaming via WebSocket
-- [ ] 5.5 Remove any local-only UI remnants
-- [ ] 5.6 Update OAuth flow for Keycloak
-- [ ] 5.7 Test all kanban functionality
+### 2.1 Workspace Routes
+- [ ] Create `src/stores/workspaces.ts` with CRUD operations
+- [ ] Create `src/routes/workspaces.ts` with routes
+- [ ] Implement `GET /api/workspaces` (list with status)
+- [ ] Implement `GET /api/workspaces/:id` (get by ID)
+- [ ] Implement `POST /api/workspaces` (create)
+- [ ] Implement `PATCH /api/workspaces/:id` (update)
+- [ ] Implement `DELETE /api/workspaces/:id` (delete)
+- [ ] Verify workspaces sorted by `updated_at DESC`
+- [ ] Verify `is_running` and `is_errored` calculated correctly
 
-## 6. Web Core (packages/web-core/)
+### 2.2 Repo Routes
+- [ ] Create `src/stores/repos.ts` with CRUD operations
+- [ ] Create `src/routes/repos.ts` with routes
+- [ ] Implement `GET /api/repos` (list all)
+- [ ] Implement `GET /api/repos/recent` (by recent usage)
+- [ ] Implement `POST /api/repos` (add repo)
+- [ ] Implement `PATCH /api/repos/:id` (update)
+- [ ] Implement `DELETE /api/repos/:id` (remove)
+- [ ] Verify path validation (must be git repo)
+- [ ] Verify repo name extracted from path
 
-- [ ] 6.1 Remove any Rust-specific types or utilities
-- [ ] 6.2 Update to use `packages/shared/` types
-- [ ] 6.3 Add agent event rendering components (ThinkingBlock, ToolCallCard, DiffViewer)
-- [ ] 6.4 Test component library with both local and remote frontends
+### 2.3 Session Routes
+- [ ] Create `src/stores/sessions.ts` with CRUD operations
+- [ ] Create `src/routes/sessions.ts` with routes
+- [ ] Implement `GET /api/workspaces/:id/sessions` (list)
+- [ ] Implement `POST /api/workspaces/:id/sessions` (create)
+- [ ] Implement `GET /api/sessions/:id` (get details)
+- [ ] Implement `POST /api/sessions/:id/start` (start agent)
+- [ ] Implement `POST /api/sessions/:id/steer` (steering message)
+- [ ] Implement `POST /api/sessions/:id/abort` (abort agent)
+- [ ] Verify sessions ordered by last used
+- [ ] Verify Pi session file created
 
-## 7. Delete Rust Codebase
+### 2.4 Config Routes
+- [ ] Create `src/stores/settings.ts` with CRUD operations
+- [ ] Create `src/routes/config.ts` with routes
+- [ ] Implement `GET /api/config` (get config)
+- [ ] Implement `PATCH /api/config` (update config)
+- [ ] Implement `GET /api/info` (user system info)
+- [ ] Verify config persisted to `config.json`
+- [ ] Verify defaults returned for missing fields
+- [ ] Verify config version migration
 
-- [ ] 7.1 Delete `crates/server/`
-- [ ] 7.2 Delete `crates/executors/`
-- [ ] 7.3 Delete `crates/db/`
-- [ ] 7.4 Delete `crates/remote/` (after cloud-api is complete)
-- [ ] 7.5 Delete `crates/relay-tunnel/` (if not already deleted)
-- [ ] 7.6 Delete `crates/relay-control/` (if not already deleted)
-- [ ] 7.7 Delete `crates/deployment/` (if not already deleted)
-- [ ] 7.8 Delete `crates/local-deployment/` (if not already deleted)
-- [ ] 7.9 Delete `crates/worktree-manager/` (ported to TypeScript)
-- [ ] 7.10 Delete `crates/workspace-manager/` (ported to TypeScript)
-- [ ] 7.11 Delete `crates/git/` (ported to TypeScript)
-- [ ] 7.12 Delete `crates/utils/` (ported to TypeScript)
-- [ ] 7.13 Delete `crates/trusted-key-auth/` (no longer needed)
-- [ ] 7.14 Delete `crates/mcp/` (evaluate if still needed or port to TypeScript)
-- [ ] 7.15 Delete `crates/review/` (evaluate if still needed or port to TypeScript)
-- [ ] 7.16 Delete `crates/server-info/` (no longer needed)
-- [ ] 7.17 Delete `crates/git-host/` (evaluate if still needed)
-- [ ] 7.18 Delete `crates/relay-tunnel/` (if not already deleted)
-- [ ] 7.19 Delete `npx-cli/`
-- [ ] 7.20 Update root `Cargo.toml` to remove deleted crates
-- [ ] 7.21 Delete `shared/types.ts` generation scripts (replaced by `packages/shared/`)
-- [ ] 7.22 Delete `shared/remote-types.ts` generation scripts
-- [ ] 7.23 Delete `shared/schemas/` (if Rust-specific)
+### 2.5 Events Route (SSE)
+- [ ] Create `src/utils/event-bus.ts` with EventEmitter
+- [ ] Create `src/routes/events.ts` with SSE endpoint
+- [ ] Implement `GET /api/events` SSE stream
+- [ ] Verify SSE connection established
+- [ ] Verify keep-alive every 30 seconds
+- [ ] Verify reconnection handled gracefully
 
-## 8. CI/CD Updates
+---
 
-- [ ] 8.1 Remove Rust build steps from GitHub Actions
-- [ ] 8.2 Add TypeScript build steps
-- [ ] 8.3 Add Electron packaging steps (macOS, Windows, Linux)
-- [ ] 8.4 Add cloud-api Docker build and push steps
-- [ ] 8.5 Update release workflow for Electron artifacts
-- [ ] 8.6 Remove `pnpm run generate-types` and `pnpm run remote:generate-types`
-- [ ] 8.7 Add `pnpm run typecheck` to CI
-- [ ] 8.8 Update test workflows for TypeScript tests
+## Phase 3: Pi SDK Integration (🟠 P1)
 
-## 9. Documentation Updates
+### 3.1 Pi Session Manager
+- [ ] Create `src/agent/pi-session.ts` wrapper
+- [ ] Integrate `createAgentSession()` from Pi SDK
+- [ ] Implement session initialization with workspace cwd
+- [ ] Implement `prompt()`, `steer()`, `followUp()`, `abort()` methods
+- [ ] Forward Pi events to event bus
+- [ ] Verify Pi session file created in data directory
+- [ ] Verify events forwarded to SSE stream
 
-- [ ] 9.1 Update root `AGENTS.md` with new architecture
-- [ ] 9.2 Update `README.md` with new setup instructions
-- [ ] 9.3 Create `packages/electron-app/README.md` with development guide
-- [ ] 9.4 Create `packages/cloud-api/README.md` with API documentation
-- [ ] 9.5 Create `packages/shared/README.md` with type usage guide
-- [ ] 9.6 Update `docs/` with new architecture diagrams
-- [ ] 9.7 Update contribution guide for TypeScript-only codebase
-- [ ] 9.8 Remove any Rust-specific documentation
+### 3.2 LiteLLM Integration
+- [ ] Create `src/auth/virtual-keys.ts` with virtual key management
+- [ ] Create `src/auth/litellm.ts` with LiteLLM configuration
+- [ ] Implement virtual key generation
+- [ ] Implement usage tracking per request
+- [ ] Implement budget enforcement
+- [ ] Implement rate limiting
+- [ ] Generate `models.json` for Pi SDK
+- [ ] Verify Pi SDK uses LiteLLM proxy
+- [ ] Verify virtual key stored in SQLite
 
-## 10. Testing & Verification
+### 3.3 Custom Kira Tools
+- [ ] Create `src/agent/tools.ts` with custom tools
+- [ ] Implement `updateTaskStatus` tool
+- [ ] Implement `requestHumanReview` tool
+- [ ] Implement `logToKanban` tool
+- [ ] Register tools with Pi session
+- [ ] Verify tools callable by agent
+- [ ] Verify tool results returned to agent
 
-- [ ] 10.1 Write unit tests for `packages/shared/` utilities
-- [ ] 10.2 Write unit tests for `packages/cloud-api/` routes
-- [ ] 10.3 Write unit tests for Electron main process modules
-- [ ] 10.4 Write integration tests for agent execution flow
-- [ ] 10.5 Write E2E tests for Electron app (Playwright or Spectron)
-- [ ] 10.6 Manual testing: Electron app launch and UI
-- [ ] 10.7 Manual testing: Agent session start, steer, abort
-- [ ] 10.8 Manual testing: Cloud sync (ElectricSQL)
-- [ ] 10.9 Manual testing: Remote-web kanban and agent history
-- [ ] 10.10 Manual testing: Auto-update flow
-- [ ] 10.11 Manual testing: Deep links
-- [ ] 10.12 Manual testing: System tray and notifications
-- [ ] 10.13 Manual testing: Offline operation and sync resume
-- [ ] 10.14 Performance testing: Electron app startup time
-- [ ] 10.15 Performance testing: Memory footprint during agent runs
+---
+
+## Phase 4: Git Operations (🟡 P2)
+
+### 4.1 Worktree Manager
+- [ ] Create `src/git/worktree.ts` with worktree operations
+- [ ] Implement `createWorktree()` function
+- [ ] Implement `deleteWorktree()` function
+- [ ] Integrate with simple-git
+- [ ] Verify worktree created from existing branch
+- [ ] Verify worktree created with new branch
+- [ ] Verify worktree deleted and cleanup
+- [ ] Handle worktree conflicts gracefully
+
+### 4.2 Workspace from PR
+- [ ] Implement `POST /api/workspaces/from-pr` endpoint
+- [ ] Parse PR URL and extract repo/branch
+- [ ] Create worktree from PR branch
+- [ ] Link to cloud issue (if applicable)
+- [ ] Verify workspace created successfully
+
+---
+
+## Phase 5: NPX Distribution (🟠 P1)
+
+### 5.1 Update npx-cli
+- [ ] Update `npx-cli/bin/cli.js` download logic
+- [ ] Point to TypeScript server package instead of Rust binary
+- [ ] Update spawn logic for Node.js execution
+- [ ] Verify `npx kira-code` downloads TypeScript server
+- [ ] Verify server starts on correct port
+- [ ] Verify frontend opens in browser
+- [ ] Test on macOS
+- [ ] Test on Windows
+- [ ] Test on Linux
+
+### 5.2 CI/CD Updates
+- [ ] Create GitHub Action for TypeScript server build
+- [ ] Add `pnpm run build` step
+- [ ] Package `dist/` for distribution
+- [ ] Upload artifact to R2 storage
+- [ ] Verify artifact accessible by npx-cli
+- [ ] Update release workflow
+
+---
+
+## Phase 6: Kira Pi Package (🟢 P3)
+
+### 6.1 Create Pi Package
+- [ ] Create `packages/kira-pi-package/` directory
+- [ ] Add `package.json` with pi manifest
+- [ ] Create `extensions/kira-tools.ts` with tool registration
+- [ ] Create `skills/kira-coding.md` with default skill
+- [ ] Create `prompts/workspace.md` with prompt template
+- [ ] Create `models.json` with LiteLLM configuration
+- [ ] Publish to npm as `@kira/pi-package`
+- [ ] Verify package installable via `pi install`
+
+---
+
+## Phase 7: Cleanup (🟢 P3)
+
+### 7.1 Remove Rust Code
+- [ ] Delete `crates/server/`
+- [ ] Delete `crates/executors/`
+- [ ] Delete `crates/db/`
+- [ ] Delete `crates/worktree-manager/`
+- [ ] Delete `crates/workspace-manager/`
+- [ ] Delete `crates/git/`
+- [ ] Delete `crates/utils/`
+- [ ] Update root `Cargo.toml`
+- [ ] Delete `pnpm run generate-types` scripts
+- [ ] Update CI/CD workflows (remove Rust build steps)
+- [ ] Verify all tests pass
+
+### 7.2 Documentation Updates
+- [ ] Update root `README.md` with new setup instructions
+- [ ] Update `AGENTS.md` with new architecture
+- [ ] Create `packages/local-server/README.md` with development guide
+- [ ] Update contribution guide
+- [ ] Remove Rust-specific documentation
+
+---
+
+## Testing Tasks
+
+### Manual Testing
+- [ ] Fresh install: `npx kira-code` on new machine
+- [ ] Workspace creation from git repo
+- [ ] Workspace creation from PR
+- [ ] Agent session start
+- [ ] Agent steering during execution
+- [ ] Agent abort
+- [ ] Config changes persist
+- [ ] Events stream in real-time
+- [ ] Migration from Rust version (if applicable)
+
+### Performance Testing
+- [ ] Server startup time < 2 seconds
+- [ ] API response time < 100ms for CRUD operations
+- [ ] SSE event latency < 500ms
+- [ ] Memory footprint during agent runs
+
+---
+
+## Critical Path
+
+```
+Phase 1 (P0) → Phase 2 (P1) → Phase 3 (P1) → Phase 5 (P1) → Done
+                      ↓              ↓
+                Phase 4 (P2)   Phase 6 (P3)
+                      ↓              ↓
+                Phase 7 (P3) ←────────┘
+```
+
+**Minimum viable**: Phases 1-3 + 5 (can run agent via NPX)
+**Full feature**: All phases (Git operations, Pi package, Rust cleanup)

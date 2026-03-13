@@ -1,44 +1,67 @@
 ## Why
 
-Kira Code's current architecture runs a Rust HTTP server (`crates/server`) alongside a planned Node.js agent-runner process, orchestrated by `npx-cli`. This dual-process design introduces unnecessary complexity: two build pipelines, two binaries to distribute, WebSocket bridge communication, shared secret management, and restart logic. The Rust server provides no CPU-intensive functionality that justifies its complexity—it's an I/O-bound HTTP API with SQLite persistence.
+Kira Code's current Rust backend (`crates/server`) provides HTTP API + SQLite but requires maintaining two ecosystems (Rust + TypeScript). The Rust server is I/O-bound (HTTP API + SQLite), not CPU-intensive, making TypeScript a better fit for a unified codebase.
 
-Meanwhile, the cloud backend (`crates/remote`) is written in Rust, requiring ts-rs type generation and maintaining two separate ecosystems (Rust + TypeScript). This creates friction: type sync issues, no code sharing between local and cloud, and a smaller hiring pool.
+**The opportunity**: Replace the Rust backend with TypeScript while keeping `npx kira-code` as the delivery mechanism. Users get the same experience with a simpler engineering surface area.
 
-**The opportunity**: Consolidate to a single TypeScript ecosystem. Electron for the desktop app (Pi SDK in-process, native OS integration), Node.js for the cloud API, shared types and validation throughout.
+**Key decision**: Use Pi SDK (`@mariozechner/pi-coding-agent`) as the unified agent runtime, replacing all Rust executors (Claude, Codex, Gemini, etc.) with a single TypeScript-native agent.
+
+**Note**: This is v1 - NPX-based local web app. Electron desktop app is deferred to a future change.
 
 ## What Changes
 
-- **BREAKING** — Delete the entire Rust codebase (`crates/server`, `crates/executors`, `crates/db`, `crates/remote`, etc.)
-- **BREAKING** — Delete `npx-cli` as a distribution mechanism (replaced by native Electron app)
-- **BREAKING** — Delete all per-agent executor modules (replaced by Pi SDK in-process)
-- **BREAKING** — Delete relay tunnel infrastructure (no longer needed)
-- Add `packages/electron-app/` — Electron main process with HTTP server, SQLite, Pi SDK, system tray, notifications, auto-update
-- Add `packages/cloud-api/` — Node.js cloud API (Hono) replacing `crates/remote`
-- Add `packages/shared/` — TypeScript types, Zod validators, shared utilities used by both Electron and cloud
-- Migrate `packages/local-web/` to Electron renderer (same React codebase, served locally)
-- Keep `packages/remote-web/` — Cloud SPA for kanban, team management, agent run history (read-only)
-- Keep `packages/web-core/` — Shared React components
-- Replace ts-rs type generation with native TypeScript types in `packages/shared/`
+- **BREAKING** — Delete Rust backend crates (`crates/server`, `crates/executors`, `crates/db`, `crates/worktree-manager`, `crates/workspace-manager`, `crates/git`)
+- **BREAKING** — Delete ts-rs type generation scripts
+- Add `packages/local-server/` — TypeScript HTTP server (Hono) with SQLite (Drizzle ORM)
+- Add `packages/kira-pi-package/` — Pi package with Kira tools, skills, and model configuration
+- Update `npx-cli/` — Download and run TypeScript server instead of Rust binary
+- Keep `packages/local-web/` — Frontend unchanged, now talks to TypeScript server
+- Keep `packages/web-core/` — Shared React components unchanged
+- Keep `packages/remote-web/` — Cloud kanban SPA (separate product)
+- Keep `packages/cloud-api/` — Cloud backend (separate product)
 
 ## Capabilities
 
 ### New Capabilities
 
-- `electron-desktop-app`: Native desktop application with system tray, notifications, background operation, auto-update, deep links, file associations. Single binary distribution (.dmg, .exe, .AppImage, .deb). Pi SDK runs in-process with zero IPC bridge.
-- `node-cloud-api`: Node.js HTTP API (Hono) for cloud backend. PostgreSQL + ElectricSQL + Keycloak OAuth. Event persistence, LiteLLM proxy token management, team management. Replaces `crates/remote`.
-- `shared-typescript-ecosystem`: Unified TypeScript codebase with native type sharing. `packages/shared/` contains types, Zod validators, and utilities used by both Electron app and cloud API. No type generation scripts, no ts-rs, no sync issues.
+- `typescript-local-server`: Node.js HTTP server (Hono) with SQLite (Drizzle ORM). Runs via `npx kira-code`. Same API as Rust server, TypeScript implementation.
+- `pi-sdk-integration`: Pi SDK (`@mariozechner/pi-coding-agent`) as unified agent runtime. Replaces all Rust executors. Single agent with configurable models.
+- `litellm-auth`: LiteLLM proxy with virtual API keys. Users subscribe to Kira Code, receive virtual keys with usage limits and budget tracking.
 
 ### Modified Capabilities
 
-- `agent-execution`: Agent runs via Pi SDK in-process within Electron main process. No subprocess spawning, no JSONL parsing, no WebSocket bridge. Typed `AgentSessionEvent` objects flow directly to renderer. Steering and abort via direct method calls.
-- `local-data-persistence`: SQLite persistence via better-sqlite3 or bun:sqlite in Electron main process. Sessions, worktrees, settings, scratch stored locally. No Rust database layer.
-- `cloud-sync`: Electron app syncs kanban data (issues, projects, tags) via ElectricSQL shapes to cloud. Agent events pushed to cloud via HTTP POST for persistence and team visibility. Works offline, syncs when connected.
-- `remote-web-ui`: Cloud SPA shows kanban (full CRUD), team management, and agent run history (read-only). No live agent execution, no workspace view, no terminal. Target users: managers, mobile users, non-developers.
+- `agent-execution`: Agent runs via Pi SDK as child process spawned by TypeScript server. Events streamed via SSE to frontend. Steering/abort via HTTP endpoints.
+- `local-data-persistence`: SQLite via better-sqlite3 + Drizzle ORM. Same schema as Rust version. Migrations on startup.
+- `npx-distribution`: `npx kira-code` downloads TypeScript server package instead of Rust binary. Same UX, different implementation.
 
 ### Removed Capabilities
 
-- `rust-local-server`: `crates/server` deleted entirely. HTTP API, SQLite, worktree management all move to Electron main process.
-- `rust-executors`: All per-agent executor modules (`claude.rs`, `cursor.rs`, `codex.rs`, etc.) deleted. Replaced by Pi SDK in-process.
-- `npx-cli-distribution`: Deleted. Replaced by native Electron app distribution with auto-update.
-- `relay-tunnel`: `crates/relay-tunnel`, `crates/relay-control` deleted. Cloud communication is direct HTTP + ElectricSQL.
-- `ts-rs-type-generation`: No more generate-types scripts. Types are native TypeScript.
+- `rust-local-server`: `crates/server` deleted. HTTP API moves to TypeScript.
+- `rust-executors`: All per-agent executor modules deleted. Replaced by Pi SDK.
+- `rust-database`: `crates/db` deleted. SQLite via Drizzle ORM.
+- `rust-worktree-manager`: Git worktree operations via simple-git in TypeScript.
+- `ts-rs-type-generation`: No more type generation. Native TypeScript types.
+
+## Migration Path
+
+**For existing users:**
+1. Install new version: `npx kira-code@latest`
+2. TypeScript server auto-migrates SQLite schema on first run
+3. Existing workspaces, repos, sessions preserved
+4. Config migrated from Rust format to TypeScript format
+
+**For developers:**
+1. Delete Rust crates from monorepo
+2. Add `packages/local-server/` with TypeScript implementation
+3. Update CI/CD to build TypeScript instead of Rust
+4. Update npx-cli download logic
+
+## Success Criteria
+
+- [ ] `npx kira-code` runs TypeScript server
+- [ ] Can create workspace and run agent
+- [ ] All existing API endpoints work
+- [ ] Events stream to frontend via SSE
+- [ ] Existing user data migrates automatically
+- [ ] Rust code deleted
+- [ ] Tests pass
