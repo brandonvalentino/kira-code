@@ -7,6 +7,8 @@ import { registerRepoRoutes } from './routes/repos.js';
 import { registerSessionRoutes } from './routes/sessions.js';
 import { registerConfigRoutes } from './routes/config.js';
 import { registerEventsRoutes } from './routes/events.js';
+import { registerAgentRoutes } from './routes/agent.js';
+import { registerModelProfileRoutes } from './routes/model-profiles.js';
 
 const PORT = parseInt(process.env.BACKEND_PORT || '3000', 10);
 
@@ -24,6 +26,8 @@ registerRepoRoutes(app);
 registerSessionRoutes(app);
 registerConfigRoutes(app);
 registerEventsRoutes(app);
+registerAgentRoutes(app);
+registerModelProfileRoutes(app);
 
 // Start the server
 console.log(`Starting Kira Code server on port ${PORT}...`);

@@ -3,7 +3,7 @@
  */
 import { eq, desc, sql } from 'drizzle-orm';
 import { getDb, executeSql } from '../db/index.js';
-import { workspaces, type Workspace, type NewWorkspace } from '../db/schema.js';
+import { workspaces, workspaceRepos, repos, type Workspace, type NewWorkspace } from '../db/schema.js';
 import { randomUUID } from 'crypto';
 
 /**
@@ -292,4 +292,48 @@ export async function countAll(): Promise<number> {
   const db = getDb();
   const results = await db.select({ count: sql<number>`count(*)` }).from(workspaces);
   return results[0]?.count ?? 0;
+}
+
+/**
+ * Find repos associated with a workspace (via workspace_repos join table).
+ * Returns repo records with their paths.
+ */
+export async function findReposForWorkspace(workspaceId: Buffer): Promise<Array<{ id: Buffer; path: string; name: string }>> {
+  const db = getDb();
+  const results = await db
+    .select({ id: repos.id, path: repos.path, name: repos.name })
+    .from(workspaceRepos)
+    .innerJoin(repos, eq(workspaceRepos.repoId, repos.id))
+    .where(eq(workspaceRepos.workspaceId, workspaceId));
+  return results;
+}
+
+/**
+ * Associate a workspace with a repo via the workspace_repos join table.
+ */
+export async function addRepoToWorkspace(workspaceId: Buffer, repoId: Buffer, targetBranch: string): Promise<void> {
+  const db = getDb();
+  const now = new Date().toISOString();
+  await db.insert(workspaceRepos).values({
+    id: Buffer.from(randomUUID().replace(/-/g, ''), 'hex'),
+    workspaceId,
+    repoId,
+    targetBranch,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
+
+/**
+ * Mark a workspace's worktree as deleted or restored.
+ */
+export async function updateWorktreeDeleted(id: Buffer, deleted: boolean): Promise<Workspace | null> {
+  const db = getDb();
+  const now = new Date().toISOString();
+  const results = await db
+    .update(workspaces)
+    .set({ worktreeDeleted: deleted, updatedAt: now })
+    .where(eq(workspaces.id, id))
+    .returning();
+  return results[0] ?? null;
 }

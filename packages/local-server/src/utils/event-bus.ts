@@ -3,6 +3,7 @@
  * Used to broadcast events from agent execution to SSE clients.
  */
 import { EventEmitter } from 'events';
+import type { AgentSessionEvent } from '@mariozechner/pi-coding-agent';
 
 /**
  * Event types that can be broadcast.
@@ -15,6 +16,8 @@ export type KiraEvent =
   | { type: 'execution_started'; executionId: string; sessionId: string }
   | { type: 'execution_completed'; executionId: string; sessionId: string }
   | { type: 'execution_failed'; executionId: string; sessionId: string }
+  | { type: 'agent_event'; sessionId: string; event: AgentSessionEvent }
+  | { type: 'review_requested'; sessionId: string; message: string }
   | { type: 'keep_alive' };
 
 /**

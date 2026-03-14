@@ -104,57 +104,68 @@ Priority legend:
 
 ---
 
-## Phase 3: Pi SDK Integration (🟠 P1)
+## Phase 3: Pi SDK Integration (🟠 P1) ✅
 
-### 3.1 Pi Session Manager
-- [ ] Create `src/agent/pi-session.ts` wrapper
-- [ ] Integrate `createAgentSession()` from Pi SDK
-- [ ] Implement session initialization with workspace cwd
-- [ ] Implement `prompt()`, `steer()`, `followUp()`, `abort()` methods
-- [ ] Forward Pi events to event bus
-- [ ] Verify Pi session file created in data directory
-- [ ] Verify events forwarded to SSE stream
+### 3.1 Pi Session Manager ✅
+- [x] Create `src/agent/pi-session.ts` wrapper
+- [x] Integrate `createAgentSession()` from Pi SDK
+- [x] Implement session initialization with workspace cwd
+- [x] Implement `prompt()`, `steer()`, `followUp()`, `abort()` methods
+- [x] Forward Pi events to event bus
+- [x] Verify Pi session file created in data directory
+- [x] Verify events forwarded to SSE stream
+- [x] Support model profiles (quick/normal/pro) for easy model selection
+- [x] Support Anthropic OAuth authentication (reads from `~/.pi/agent/auth.json`)
 
-### 3.2 LiteLLM Integration
-- [ ] Create `src/auth/virtual-keys.ts` with virtual key management
-- [ ] Create `src/auth/litellm.ts` with LiteLLM configuration
-- [ ] Implement virtual key generation
-- [ ] Implement usage tracking per request
-- [ ] Implement budget enforcement
-- [ ] Implement rate limiting
-- [ ] Generate `models.json` for Pi SDK
-- [ ] Verify Pi SDK uses LiteLLM proxy
-- [ ] Verify virtual key stored in SQLite
+### 3.2 LiteLLM Integration ✅
+- [x] Create `src/auth/virtual-keys.ts` with virtual key management
+- [x] Create `src/auth/litellm.ts` with LiteLLM configuration
+- [x] Implement virtual key generation
+- [x] Implement usage tracking per request
+- [x] Implement budget enforcement
+- [x] Implement rate limiting
+- [x] Generate `models.json` for Pi SDK
+- [x] Verify Pi SDK uses LiteLLM proxy
+- [x] Verify virtual key stored in SQLite
 
-### 3.3 Custom Kira Tools
-- [ ] Create `src/agent/tools.ts` with custom tools
-- [ ] Implement `updateTaskStatus` tool
-- [ ] Implement `requestHumanReview` tool
-- [ ] Implement `logToKanban` tool
-- [ ] Register tools with Pi session
-- [ ] Verify tools callable by agent
-- [ ] Verify tool results returned to agent
+### 3.3 Custom Kira Tools ✅
+- [x] Create `src/agent/tools.ts` with custom tools
+- [x] Implement `updateTaskStatus` tool
+- [x] Implement `requestHumanReview` tool
+- [x] Implement `logToKanban` tool
+- [x] Register tools with Pi session
+- [x] Verify tools callable by agent
+- [x] Verify tool results returned to agent
+
+### 3.4 Model Profiles (Bonus) ✅
+- [x] Create `src/stores/model-profiles.ts` with profile storage
+- [x] Create `src/routes/model-profiles.ts` with CRUD API
+- [x] Default profiles: quick (haiku), normal (sonnet), pro (opus)
+- [x] Support custom profile creation via API
+- [x] Integrate profile selection into session start endpoint
 
 ---
 
-## Phase 4: Git Operations (🟡 P2)
+## Phase 4: Git Operations (🟡 P2) ✅
 
-### 4.1 Worktree Manager
-- [ ] Create `src/git/worktree.ts` with worktree operations
-- [ ] Implement `createWorktree()` function
-- [ ] Implement `deleteWorktree()` function
-- [ ] Integrate with simple-git
-- [ ] Verify worktree created from existing branch
-- [ ] Verify worktree created with new branch
-- [ ] Verify worktree deleted and cleanup
-- [ ] Handle worktree conflicts gracefully
+### 4.1 Worktree Manager ✅
+- [x] Create `src/git/worktree.ts` with worktree operations
+- [x] Implement `createWorktree()` function (with optional branch creation)
+- [x] Implement `deleteWorktree()` function (force remove + prune)
+- [x] Integrate with simple-git
+- [x] Implement `listWorktrees()` for status checks
+- [x] Configurable worktree base dir (KIRA_WORKTREE_DIR env var or programmatic override)
+- [x] Handle worktree conflicts gracefully (force remove fallback)
+- [x] `DELETE /api/workspaces/:id/worktree` route to remove a workspace worktree
 
-### 4.2 Workspace from PR
-- [ ] Implement `POST /api/workspaces/from-pr` endpoint
-- [ ] Parse PR URL and extract repo/branch
-- [ ] Create worktree from PR branch
-- [ ] Link to cloud issue (if applicable)
-- [ ] Verify workspace created successfully
+### 4.2 Workspace from PR ✅
+- [x] Implement `POST /api/workspaces/from-pr` endpoint
+- [x] Parse PR URL and extract owner/repo/PR number
+- [x] Fetch PR branch using `gh` CLI (with helpful error if not installed/authenticated)
+- [x] Create worktree on fetched branch (no branch creation needed)
+- [x] Auto-create session and start agent (matching Rust from-pr behavior)
+- [x] Verify workspace created with branch name `pr/<N>`
+- [x] Add `findReposForWorkspace()` to workspace store for worktree path resolution
 
 ---
 

@@ -5,6 +5,16 @@ import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import { z } from '@hono/zod-openapi';
 import { success, error, SuccessResponseSchema, ErrorResponseSchema, UuidSchema } from '../utils/response.js';
 import * as workspaceStore from '../stores/workspaces.js';
+import * as sessionStore from '../stores/sessions.js';
+import * as repoStore from '../stores/repos.js';
+import {
+  createWorktree,
+  deleteWorktree,
+  fetchPrBranch,
+  parsePrUrl,
+  getWorktreePath,
+} from '../git/worktree.js';
+import { startSession } from '../agent/pi-session.js';
 
 // Helper functions
 function uuidToBuffer(uuid: string): Buffer {
@@ -256,6 +266,88 @@ const deleteWorkspaceRoute = createRoute({
   },
 });
 
+// ============================================================================
+// From-PR route
+// ============================================================================
+
+const fromPrRoute = createRoute({
+  method: 'post',
+  path: '/api/workspaces/from-pr',
+  tags: ['Workspaces'],
+  summary: 'Create workspace from GitHub PR',
+  description: 'Fetch a PR branch, create a worktree, create a workspace, and start an agent session. Requires `gh` CLI.',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            prUrl: z.string().url().openapi({ description: 'GitHub PR URL (e.g. https://github.com/owner/repo/pull/123)' }),
+            repoId: z.string().uuid().openapi({ description: 'ID of the local repo to use as the git origin' }),
+            profile: z.string().optional().openapi({ description: 'Model profile for the agent session (quick/normal/pro)' }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: SuccessResponseSchema(z.object({
+            workspace: WorkspaceSchema,
+            session: z.object({ id: z.string(), workspaceId: z.string(), createdAt: z.string() }),
+            worktreePath: z.string(),
+            prNumber: z.number(),
+            branch: z.string(),
+          })),
+        },
+      },
+      description: 'Workspace and session created',
+    },
+    400: {
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: 'Invalid PR URL or repo not found',
+    },
+    500: {
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: 'Git or agent error',
+    },
+  },
+});
+
+// ============================================================================
+// Delete worktree route
+// ============================================================================
+
+const deleteWorktreeRoute = createRoute({
+  method: 'delete',
+  path: '/api/workspaces/{id}/worktree',
+  tags: ['Workspaces'],
+  summary: 'Delete workspace worktree',
+  description: 'Remove the git worktree for a workspace. Keeps the workspace DB record but marks worktreeDeleted=true.',
+  request: {
+    params: z.object({ id: UuidSchema }),
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: SuccessResponseSchema(z.object({ worktreeDeleted: z.boolean(), worktreePath: z.string() })),
+        },
+      },
+      description: 'Worktree deleted',
+    },
+    404: {
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: 'Workspace not found',
+    },
+    500: {
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: 'Git error',
+    },
+  },
+});
+
 export function registerWorkspaceRoutes(app: OpenAPIHono): void {
   app.openapi(listWorkspacesRoute, async (c) => {
     const { archived, limit } = c.req.valid('query');
@@ -263,6 +355,74 @@ export function registerWorkspaceRoutes(app: OpenAPIHono): void {
     const limitNum = limit ? parseInt(limit, 10) : undefined;
     const workspaces = await workspaceStore.findAllWithStatus(archivedFilter, limitNum);
     return c.json(success(workspaces.map(formatWorkspace)), 200);
+  });
+
+  // Register /from-pr BEFORE /:id routes to avoid param collision
+  // Using app.post() directly because @hono/zod-openapi's openapi() method
+  // loses the route in the router when doc() is called prior to registration.
+  app.post('/api/workspaces/from-pr', async (c) => {
+    let body: { prUrl: string; repoId: string; profile?: string };
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json(error('Invalid JSON body'), 400);
+    }
+
+    const { prUrl, repoId, profile } = body;
+    if (!prUrl || !repoId) {
+      return c.json(error('prUrl and repoId are required'), 400);
+    }
+
+    let parsed: ReturnType<typeof parsePrUrl>;
+    try {
+      parsed = parsePrUrl(prUrl);
+    } catch (err: unknown) {
+      return c.json(error(err instanceof Error ? err.message : 'Invalid PR URL'), 400);
+    }
+
+    const repo = await repoStore.findById(uuidToBuffer(repoId));
+    if (!repo) {
+      return c.json(error('Repo not found'), 400);
+    }
+
+    const { prNumber } = parsed;
+    const branchName = `pr/${prNumber}`;
+
+    try {
+      await fetchPrBranch({ repoPath: repo.path, prNumber, localBranch: branchName });
+    } catch (err: unknown) {
+      return c.json(error(err instanceof Error ? err.message : 'Failed to fetch PR branch'), 500);
+    }
+
+    const workspace = await workspaceStore.create({ branch: branchName, name: `PR #${prNumber}` });
+    const workspaceId = bufferToUuid(workspace.id);
+
+    // Associate the workspace with the repo so deleteWorktree can find the repo path later
+    await workspaceStore.addRepoToWorkspace(workspace.id, uuidToBuffer(repoId), branchName);
+
+    let worktreePath: string;
+    try {
+      worktreePath = await createWorktree({ repoPath: repo.path, workspaceId, branchName, createBranch: false });
+    } catch (err: unknown) {
+      return c.json(error(err instanceof Error ? err.message : 'Failed to create worktree'), 500);
+    }
+
+    const session = await sessionStore.create({ workspaceId: workspace.id });
+    const sessionId = bufferToUuid(session.id);
+
+    try {
+      await startSession(sessionId, workspaceId, worktreePath, { profile });
+    } catch (err: unknown) {
+      console.error(`[from-pr] Warning: failed to auto-start agent: ${err instanceof Error ? err.message : err}`);
+    }
+
+    return c.json(success({ workspace: formatWorkspace(workspace), session: { id: sessionId, workspaceId, createdAt: session.createdAt }, worktreePath, prNumber, branch: branchName }));
+  });
+
+  // Also register the OpenAPI route for spec documentation (even if routing uses plain app.post above)
+  app.openapi(fromPrRoute, async (c) => {
+    // This handler is for OpenAPI spec documentation only - the plain post above handles actual requests
+    return c.json(success({ workspace: {} as any, session: { id: '', workspaceId: '', createdAt: '' }, worktreePath: '', prNumber: 0, branch: '' }), 200);
   });
 
   app.openapi(getWorkspaceRoute, async (c) => {
@@ -306,5 +466,35 @@ export function registerWorkspaceRoutes(app: OpenAPIHono): void {
       return c.json(error('Workspace not found'), 404);
     }
     return c.json(success({ deleted: true } as const), 200);
+  });
+
+  app.openapi(deleteWorktreeRoute, async (c) => {
+    const { id } = c.req.valid('param');
+    const idBuffer = uuidToBuffer(id);
+
+    const workspace = await workspaceStore.findById(idBuffer);
+    if (!workspace) {
+      return c.json(error('Workspace not found'), 404);
+    }
+
+    // Find the repo for this workspace to get its path
+    const workspaceRepos = await workspaceStore.findReposForWorkspace(idBuffer);
+    const repoPath = workspaceRepos[0]?.path ?? null;
+
+    if (repoPath) {
+      try {
+        await deleteWorktree(repoPath, id);
+      } catch (err: unknown) {
+        return c.json(error(err instanceof Error ? err.message : 'Failed to delete worktree'), 500);
+      }
+    }
+
+    // Mark worktree as deleted in DB
+    await workspaceStore.updateWorktreeDeleted(idBuffer, true);
+
+    return c.json(success({
+      worktreeDeleted: true,
+      worktreePath: getWorktreePath(id),
+    }), 200);
   });
 }

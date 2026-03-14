@@ -19,9 +19,12 @@
     "@hono/node-server": "^1.14.0",
     "@hono/zod-openapi": "^0.19.10",
     "@libsql/client": "^0.15.0",
+    "@mariozechner/pi-coding-agent": "^0.57.1",
     "@scalar/hono-api-reference": "^0.10.3",
+    "@sinclair/typebox": "^0.34.48",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.12.7",
+    "simple-git": "^3.33.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

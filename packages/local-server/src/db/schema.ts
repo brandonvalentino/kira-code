@@ -365,6 +365,19 @@ export const migrationState = sqliteTable('migration_state', {
 ]);
 
 // ============================================================================
+// Virtual Keys (LiteLLM proxy key management)
+// ============================================================================
+
+export const virtualKeys = sqliteTable('virtual_keys', {
+  id: blob('id', { mode: 'buffer' }).primaryKey(),
+  key: text('key').notNull().unique(),
+  budgetTokens: integer('budget_tokens'),
+  usedTokens: integer('used_tokens').notNull().default(0),
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
+});
+
+// ============================================================================
 // Type Exports
 // ============================================================================
 
@@ -387,3 +400,5 @@ export type Tag = typeof tags.$inferSelect;
 export type Scratch = typeof scratch.$inferSelect;
 export type Merge = typeof merges.$inferSelect;
 export type MigrationState = typeof migrationState.$inferSelect;
+export type VirtualKey = typeof virtualKeys.$inferSelect;
+export type NewVirtualKey = typeof virtualKeys.$inferInsert;
