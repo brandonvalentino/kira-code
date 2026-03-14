@@ -1,0 +1,36 @@
+{
+  "name": "@kira/local-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "node --import @oxc-node/core/register src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "@hono/zod-openapi": "^0.19.10",
+    "@libsql/client": "^0.15.0",
+    "@scalar/hono-api-reference": "^0.10.3",
+    "drizzle-orm": "^0.43.1",
+    "hono": "^4.12.7",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@oxc-node/core": "^0.0.35",
+    "@types/node": "^22.13.0",
+    "drizzle-kit": "^0.30.0",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

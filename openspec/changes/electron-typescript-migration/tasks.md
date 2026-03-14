@@ -10,13 +10,23 @@ Priority legend:
 
 ## Phase 1: Foundation (🔴 P0)
 
-### 1.1 Project Setup
-- [ ] Create `packages/local-server/` directory structure
-- [ ] Add `package.json` with dependencies (Hono, Drizzle, better-sqlite3, Pi SDK)
-- [ ] Add `tsconfig.json` for TypeScript
-- [ ] Create basic `src/index.ts` entry point
-- [ ] Verify `pnpm install` succeeds
-- [ ] Verify `pnpm run build` produces `dist/index.js`
+### 1.1 Project Setup ✅
+- [x] Create `packages/local-server/` directory structure
+- [x] Add `package.json` with dependencies:
+  - `hono@^4.12.7` - Web framework
+  - `drizzle-orm@^0.43.1` - ORM
+  - `@libsql/client@^0.15.0` - libSQL driver (replaced better-sqlite3 for more features)
+  - `@hono/zod-openapi@^0.19.10` - OpenAPI integration with Zod v3
+  - `@scalar/hono-api-reference@^0.10.3` - Beautiful API docs UI
+  - `@hono/node-server@^1.14.0` - Node.js server adapter
+  - `zod@^3.25.76` - Schema validation
+  - DevDependencies: `@oxc-node/core@^0.0.35` (fast TS runner), `typescript@^5.9.2`, `drizzle-kit@^0.30.0`
+- [x] Add `tsconfig.json` for TypeScript (Node.js ESM, target ES2022)
+- [x] Create `drizzle.config.ts` for SQLite migrations
+- [x] Create `src/utils/assets.ts` with asset directory resolution (`~/.local/share/kira-code`)
+- [x] Create basic `src/index.ts` entry point with configurable port via `BACKEND_PORT`
+- [x] Verify `pnpm install` succeeds
+- [x] Verify `pnpm run build` produces `dist/index.js`
 
 ### 1.2 Database Layer
 - [ ] Create `src/db/schema.ts` with Drizzle schema (match Rust exactly)
@@ -29,14 +39,17 @@ Priority legend:
 - [ ] Test insert and query for repo
 - [ ] Verify foreign key constraints work
 
-### 1.3 HTTP Server
-- [ ] Create `src/server.ts` with Hono server
-- [ ] Add CORS middleware (allow localhost:3000, localhost:5173)
-- [ ] Add logger middleware
-- [ ] Create `src/routes/health.ts` with `/health` endpoint
+### 1.3 HTTP Server ✅
+- [x] Create `src/server.ts` with Hono server using `OpenAPIHono`
+- [x] Add CORS middleware (allow localhost:3000, localhost:5173, 127.0.0.1 variants)
+- [x] Add logger middleware
+- [x] Create `src/routes/health.ts` with `/health` endpoint (OpenAPI documented)
+- [x] Add Scalar API reference UI at `/scalar` endpoint
+- [x] Add OpenAPI 3.1.0 spec at `/doc` endpoint
+- [x] Verify server starts on configurable port (`BACKEND_PORT` env var, default 3000)
+- [x] Verify `/health` returns `{ "status": "ok" }`
+- [x] Verify `/scalar` shows interactive API documentation
 - [ ] Create `src/utils/response.ts` with API response helpers
-- [ ] Verify server starts on configurable port
-- [ ] Verify `/health` returns `{ "status": "ok" }`
 
 ---
 
@@ -244,3 +257,27 @@ Phase 1 (P0) → Phase 2 (P1) → Phase 3 (P1) → Phase 5 (P1) → Done
 
 **Minimum viable**: Phases 1-3 + 5 (can run agent via NPX)
 **Full feature**: All phases (Git operations, Pi package, Rust cleanup)
+
+---
+
+## Implementation Notes
+
+### Section 1.1 Decisions
+
+**Dependency choices:**
+- **libsql over better-sqlite3**: Chose `@libsql/client` for additional features (encryption at rest, Turso remote DB support, more ALTER statements)
+- **@oxc-node/core for dev**: Fast TypeScript runner using Oxc's Rust-based transformer instead of esbuild/tsx
+- **@hono/zod-openapi v0.19.x**: Using v0.19.x series for Zod v3 compatibility (v1.x requires Zod v4)
+- **Scalar for API docs**: Integrated `@scalar/hono-api-reference` for beautiful, interactive API documentation at `/scalar`
+
+**Build strategy:**
+- **Dev**: `node --import @oxc-node/core/register src/index.ts` - Direct TypeScript execution
+- **Build**: `tsc` - Standard TypeScript compilation (no bundling needed for Node.js)
+- **Type-check**: `tsc --noEmit` - Verify types without emitting
+
+**Scripts added to package.json:**
+- `dev` - Run with oxc-node transformer
+- `build` - Compile TypeScript
+- `start` - Run compiled JS
+- `check` - Type-check only
+- `db:generate`, `db:migrate`, `db:push`, `db:studio` - Drizzle Kit commands
