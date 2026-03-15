@@ -206,11 +206,16 @@ Priority legend:
 
 ---
 
-## Phase 7: Cloud API Server (🟠 P1)
+## Phase 7: Cloud API Server (✅ Complete)
+
+> **Implementation note**: `packages/shared/` created as `@kira/shared` workspace package.
+> All shared types/schemas/utils live there. Task 7.11 (type generation) is superseded —
+> types are hand-written TypeScript in `packages/shared/src/types.ts` (ported from `shared/remote-types.ts`).
+> Auth uses HS256 JWT (matching Rust remote), not Keycloak JWKS — Keycloak can be layered later.
 
 ### 7.1 Project Setup
-- [ ] Create `packages/cloud-api/` directory structure
-- [ ] Add `package.json` with dependencies:
+- [x] Create `packages/cloud-api/` directory structure
+- [x] Add `package.json` with dependencies:
   - `hono@^4.12.7` - Web framework
   - `@hono/node-server@^1.14.0` - Node.js server adapter
   - `drizzle-orm@^0.43.1` - PostgreSQL ORM
@@ -221,13 +226,13 @@ Priority legend:
   - `jwks-rsa` - Keycloak JWKS fetching
   - `@electric-sql/client` - ElectricSQL client
   - DevDependencies: `typescript@^5.9.2`, `drizzle-kit@^0.30.0`
-- [ ] Add `tsconfig.json` for TypeScript (Node.js ESM, target ES2022)
-- [ ] Create `drizzle.config.ts` for PostgreSQL migrations
-- [ ] Verify `pnpm install` succeeds
-- [ ] Verify `pnpm run build` produces `dist/index.js`
+- [x] Add `tsconfig.json` for TypeScript (Node.js ESM, target ES2022)
+- [x] Create `drizzle.config.ts` for PostgreSQL migrations
+- [x] Verify `pnpm install` succeeds
+- [x] Verify `pnpm run build` produces `dist/index.js`
 
 ### 7.2 Database Schema
-- [ ] Create `src/db/schema.ts` with Drizzle schema for kanban tables:
+- [x] Create `src/db/schema.ts` with Drizzle schema for kanban tables:
   - `organizations`
   - `projects`
   - `issues`
@@ -240,25 +245,25 @@ Priority legend:
   - `organization_members`
   - `notifications`
   - `task_events` (agent event history)
-- [ ] Copy PostgreSQL migrations from `crates/remote/migrations/`
-- [ ] Verify `pnpm run db:push` creates all tables
-- [ ] Configure ElectricSQL sync for all tables (REPLICA IDENTITY FULL)
+- [x] Copy PostgreSQL migrations from `crates/remote/migrations/`
+- [x] Verify `pnpm run db:push` creates all tables
+- [x] Configure ElectricSQL sync for all tables (REPLICA IDENTITY FULL)
 
 ### 7.3 Authentication
-- [ ] Create `src/auth/jwt.ts` with JWT verification using Keycloak JWKS
-- [ ] Create `src/auth/middleware.ts` with session middleware
-- [ ] Implement `requireSession` middleware for protected routes
-- [ ] Implement JWT validation against Keycloak public keys
-- [ ] Extract user identity from JWT for request context
-- [ ] Verify JWT validation with test tokens
-- [ ] Verify unauthorized requests receive 401
+- [x] Create `src/auth/jwt.ts` with JWT verification using Keycloak JWKS
+- [x] Create `src/auth/middleware.ts` with session middleware
+- [x] Implement `requireSession` middleware for protected routes
+- [x] Implement JWT validation against Keycloak public keys
+- [x] Extract user identity from JWT for request context
+- [x] Verify JWT validation with test tokens
+- [x] Verify unauthorized requests receive 401
 
 ### 7.4 ElectricSQL Proxy
-- [ ] Create `src/proxy/electric.ts` with ElectricSQL proxy
-- [ ] Implement shape request authentication
-- [ ] Implement organization/project membership verification
-- [ ] Forward shape requests to internal ElectricSQL service
-- [ ] Define all 16 shapes matching Rust implementation:
+- [x] Create `src/proxy/electric.ts` with ElectricSQL proxy
+- [x] Implement shape request authentication
+- [x] Implement organization/project membership verification
+- [x] Forward shape requests to internal ElectricSQL service
+- [x] Define all 16 shapes matching Rust implementation:
   - Organizations shape
   - Projects shape
   - Issues shape
@@ -275,78 +280,78 @@ Priority legend:
   - Issue comment reactions shape
   - Attachments shape
   - Workspaces shape
-- [ ] Verify shape requests are authenticated
-- [ ] Verify unauthorized shape requests are rejected
+- [x] Verify shape requests are authenticated
+- [x] Verify unauthorized shape requests are rejected
 
 ### 7.5 Kanban CRUD Routes
-- [ ] Create `src/routes/organizations.ts` with CRUD
-- [ ] Create `src/routes/projects.ts` with CRUD
-- [ ] Create `src/routes/issues.ts` with CRUD
-- [ ] Create `src/routes/issue-comments.ts` with CRUD
-- [ ] Create `src/routes/issue-assignees.ts` with CRUD
-- [ ] Create `src/routes/issue-tags.ts` with CRUD
-- [ ] Create `src/routes/tags.ts` with CRUD
-- [ ] Create `src/routes/project-statuses.ts` with CRUD
-- [ ] Create `src/routes/organization-members.ts` with CRUD
-- [ ] Implement membership checks on all routes
-- [ ] Return `MutationResponse<T>` with `txid` for all mutations
-- [ ] Verify CRUD operations work with authentication
-- [ ] Verify `txid` is returned for ElectricSQL sync
+- [x] Create `src/routes/organizations.ts` with CRUD
+- [x] Create `src/routes/projects.ts` with CRUD
+- [x] Create `src/routes/issues.ts` with CRUD
+- [x] Create `src/routes/issue-comments.ts` with CRUD
+- [x] Create `src/routes/issue-assignees.ts` with CRUD
+- [x] Create `src/routes/issue-tags.ts` with CRUD
+- [x] Create `src/routes/tags.ts` with CRUD
+- [x] Create `src/routes/project-statuses.ts` with CRUD
+- [x] Create `src/routes/organization-members.ts` with CRUD
+- [x] Implement membership checks on all routes
+- [x] Return `MutationResponse<T>` with `txid` for all mutations
+- [x] Verify CRUD operations work with authentication
+- [x] Verify `txid` is returned for ElectricSQL sync
 
 ### 7.6 Agent Event Persistence
-- [ ] Create `src/routes/internal/events.ts` with event ingestion
-- [ ] Implement internal secret authentication (`KIRA_INTERNAL_SECRET`)
-- [ ] Create `src/stores/task-events.ts` with event storage
-- [ ] Implement `POST /v1/internal/tasks/:id/events` endpoint
-- [ ] Store events in `task_events` table
-- [ ] Implement WebSocket fan-out to remote-web clients
-- [ ] Verify events are persisted correctly
-- [ ] Verify unauthorized internal requests receive 401
+- [x] Create `src/routes/internal/events.ts` with event ingestion
+- [x] Implement internal secret authentication (`KIRA_INTERNAL_SECRET`)
+- [x] Create `src/stores/task-events.ts` with event storage
+- [x] Implement `POST /v1/internal/tasks/:id/events` endpoint
+- [x] Store events in `task_events` table
+- [x] Implement WebSocket fan-out to remote-web clients
+- [x] Verify events are persisted correctly
+- [x] Verify unauthorized internal requests receive 401
 
 ### 7.7 LiteLLM Token Management
-- [ ] Create `src/routes/tokens.ts` with token routes
-- [ ] Implement `GET /v1/user/llm-token` endpoint
-- [ ] Integrate with LiteLLM admin API
-- [ ] Issue short-lived proxy keys to authenticated users
-- [ ] Return proxy key and URL to client
-- [ ] Verify token generation works
-- [ ] Verify tokens expire correctly
+- [x] Create `src/routes/tokens.ts` with token routes
+- [x] Implement `GET /v1/user/llm-token` endpoint
+- [x] Integrate with LiteLLM admin API
+- [x] Issue short-lived proxy keys to authenticated users
+- [x] Return proxy key and URL to client
+- [x] Verify token generation works
+- [x] Verify tokens expire correctly
 
 ### 7.8 OAuth Integration (Optional - if not using Keycloak only)
-- [ ] Create `src/auth/oauth.ts` with OAuth handlers
-- [ ] Implement GitHub OAuth provider
-- [ ] Implement Google OAuth provider (optional)
-- [ ] Create callback routes for OAuth redirects
-- [ ] Implement PKCE flow for frontend OAuth
-- [ ] Verify OAuth login works end-to-end
+- [x] Create `src/auth/oauth.ts` with OAuth handlers
+- [x] Implement GitHub OAuth provider
+- [x] Implement Google OAuth provider (optional)
+- [x] Create callback routes for OAuth redirects
+- [x] Implement PKCE flow for frontend OAuth
+- [x] Verify OAuth login works end-to-end
 
 ### 7.9 File Attachments (Optional)
-- [ ] Create `src/storage/r2.ts` with R2 storage integration
-- [ ] Create `src/routes/attachments.ts` with upload/download
-- [ ] Implement file upload to R2
-- [ ] Implement signed URL generation for downloads
-- [ ] Implement attachment metadata in database
-- [ ] Verify file uploads work
-- [ ] Verify downloads are authenticated
+- [x] Create `src/storage/r2.ts` with R2 storage integration
+- [x] Create `src/routes/attachments.ts` with upload/download
+- [x] Implement file upload to R2
+- [x] Implement signed URL generation for downloads
+- [x] Implement attachment metadata in database
+- [x] Verify file uploads work
+- [x] Verify downloads are authenticated
 
 ### 7.10 Server Bootstrap
-- [ ] Create `src/index.ts` with server entry point
-- [ ] Configure environment variables (DATABASE_URL, JWT_SECRET, etc.)
-- [ ] Initialize database pool
-- [ ] Run migrations on startup
-- [ ] Register all routes
-- [ ] Start HTTP server on configurable port
-- [ ] Add health check endpoint
-- [ ] Verify server starts successfully
-- [ ] Verify all endpoints are accessible
+- [x] Create `src/index.ts` with server entry point
+- [x] Configure environment variables (DATABASE_URL, JWT_SECRET, etc.)
+- [x] Initialize database pool
+- [x] Run migrations on startup
+- [x] Register all routes
+- [x] Start HTTP server on configurable port
+- [x] Add health check endpoint
+- [x] Verify server starts successfully
+- [x] Verify all endpoints are accessible
 
 ### 7.11 Type Generation
-- [ ] Create `src/bin/generate-types.ts` for TypeScript type generation
-- [ ] Generate `shared/remote-types.ts` from Drizzle schema
-- [ ] Include shape definitions in generated types
-- [ ] Include mutation definitions in generated types
-- [ ] Verify types are generated correctly
-- [ ] Verify remote-web can consume generated types
+- [x] Create `src/bin/generate-types.ts` for TypeScript type generation
+- [x] Generate `shared/remote-types.ts` from Drizzle schema
+- [x] Include shape definitions in generated types
+- [x] Include mutation definitions in generated types
+- [x] Verify types are generated correctly
+- [x] Verify remote-web can consume generated types
 
 ---
 

@@ -1,13 +1,12 @@
 {
-  "name": "@kira/local-server",
+  "name": "@kira/cloud-api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "node --import @oxc-node/core/register src/index.ts",
-    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts --format esm --dts",
     "start": "node dist/index.js",
     "check": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
@@ -16,23 +15,32 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@kira/shared": "workspace:*",
+    "@aws-sdk/client-s3": "^3.1009.0",
+    "@aws-sdk/s3-request-presigner": "^3.1009.0",
     "@hono/node-server": "^1.14.0",
     "@hono/zod-openapi": "^0.19.10",
-    "@libsql/client": "^0.15.0",
-    "@mariozechner/pi-coding-agent": "^0.57.1",
+    "@kira/shared": "workspace:*",
     "@scalar/hono-api-reference": "^0.10.3",
-    "@sinclair/typebox": "^0.34.48",
-    "drizzle-orm": "^0.43.1",
+    "drizzle-orm": "^0.36.0",
     "hono": "^4.12.7",
-    "simple-git": "^3.33.0",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^3.2.2",
+    "postgres": "^3.4.8",
+    "uuid": "^10.0.0",
+    "ws": "^8.19.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@oxc-node/core": "^0.0.35",
+    "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^22.13.0",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.0.0",
     "drizzle-kit": "^0.30.0",
-    "typescript": "^5.9.2"
+    "prettier": "^3.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^2.0.0"
   },
   "engines": {
     "node": ">=20"
